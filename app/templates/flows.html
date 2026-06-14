@@ -1,0 +1,148 @@
+{% extends "base.html" %}
+
+{% block title %}Журналы потоков | Incoming Mail Register{% endblock %}
+
+{% block extra_css %}
+<style>
+    .flows-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+        gap: 1.5rem;
+        margin-top: 1.5rem;
+    }
+    
+    .flow-folder {
+        background: var(--bg-card);
+        border-radius: var(--radius-lg);
+        border: 1px solid var(--border);
+        padding: 1.25rem;
+        transition: var(--transition);
+        cursor: pointer;
+        text-decoration: none;
+        display: block;
+    }
+    
+    .flow-folder:hover {
+        transform: translateY(-4px);
+        box-shadow: var(--shadow-lg);
+    }
+    
+    .folder-icon {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        margin-bottom: 1rem;
+    }
+    
+    .folder-icon svg {
+        width: 40px;
+        height: 40px;
+        stroke: var(--primary);
+    }
+    
+    .folder-name {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: var(--text-primary);
+    }
+    
+    .folder-stats {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 1rem;
+        padding-top: 1rem;
+        border-top: 1px solid var(--border);
+    }
+    
+    .stat-badge {
+        text-align: center;
+    }
+    
+    .stat-number {
+        font-size: 1.3rem;
+        font-weight: 800;
+        color: var(--primary);
+    }
+    
+    .stat-label {
+        font-size: 0.7rem;
+        color: var(--text-secondary);
+    }
+    
+    .progress-bar {
+        height: 6px;
+        background: var(--gray-200);
+        border-radius: 3px;
+        overflow: hidden;
+        margin: 0.75rem 0;
+    }
+    
+    .progress-fill {
+        height: 100%;
+        background: linear-gradient(90deg, var(--primary), var(--secondary));
+        border-radius: 3px;
+        transition: width 0.3s ease;
+    }
+    
+    .empty-state {
+        text-align: center;
+        padding: 3rem;
+        background: var(--bg-card);
+        border-radius: var(--radius-lg);
+        border: 1px solid var(--border);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div style="margin-bottom: 1.5rem;">
+    <h1 style="font-size: 1.5rem; font-weight: 800; color: var(--text-primary); margin-bottom: 0.25rem;">
+        📁 Журналы потоков
+    </h1>
+    <p style="color: var(--text-secondary); font-size: 0.85rem;">
+        Письма сгруппированы по потокам (например: 07-25, 07-29 и т.д.)
+    </p>
+</div>
+
+{% if flows %}
+<div class="flows-grid">
+    {% for flow in flows %}
+    <a href="/flows/{{ flow.name }}" class="flow-folder">
+        <div class="folder-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>
+            </svg>
+            <div class="folder-name">{{ flow.name }}</div>
+        </div>
+        
+        <div class="progress-bar">
+            <div class="progress-fill" style="width: {{ flow.progress_percent }}%;"></div>
+        </div>
+        
+        <div class="folder-stats">
+            <div class="stat-badge">
+                <div class="stat-number">{{ flow.total }}</div>
+                <div class="stat-label">Всего</div>
+            </div>
+            <div class="stat-badge">
+                <div class="stat-number" style="color: #10b981;">{{ flow.completed }}</div>
+                <div class="stat-label">Выполнено</div>
+            </div>
+            <div class="stat-badge">
+                <div class="stat-number" style="color: #f59e0b;">{{ flow.in_progress }}</div>
+                <div class="stat-label">В работе</div>
+            </div>
+        </div>
+    </a>
+    {% endfor %}
+</div>
+{% else %}
+<div class="empty-state">
+    <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="margin-bottom: 1rem;">
+        <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>
+    </svg>
+    <h4 style="font-size: 1rem; font-weight: 600; margin-bottom: 0.5rem;">Нет потоков</h4>
+    <p style="color: var(--text-secondary);">Пока нет ни одного письма с потоком. Добавьте письмо с номером вида 642/07-25</p>
+</div>
+{% endif %}
+{% endblock %}

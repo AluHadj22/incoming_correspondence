@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block title %}Ошибка сервера{% endblock %}
+
+{% block content %}
+<div class="card" style="text-align: center; padding: 60px 20px;">
+    <h1 style="font-size: 72px; color: #e53e3e;">500</h1>
+    <h2>Внутренняя ошибка сервера</h2>
+    <p>Извините, произошла ошибка. Попробуйте позже.</p>
+    {% if error %}
+    <div class="alert alert-danger" style="margin-top: 20px;">
+        <strong>Детали ошибки:</strong> {{ error }}
+    </div>
+    {% endif %}
+    <a href="/" class="btn btn-primary" style="margin-top: 20px;">Вернуться на главную</a>
+</div>
+{% endblock %}

@@ -1,0 +1,263 @@
+{% extends "base.html" %}
+
+{% block title %}Поток {{ flow_name }} | Incoming Mail Register{% endblock %}
+
+{% block extra_css %}
+<style>
+    .flow-header {
+        background: var(--bg-card);
+        border-radius: var(--radius-lg);
+        border: 1px solid var(--border);
+        padding: 1.25rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .flow-stats {
+        display: flex;
+        gap: 1.5rem;
+        flex-wrap: wrap;
+        margin-top: 1rem;
+    }
+    
+    .flow-stat {
+        background: var(--gray-100);
+        border-radius: var(--radius-md);
+        padding: 0.75rem 1.25rem;
+        text-align: center;
+    }
+    
+    [data-theme='dark'] .flow-stat {
+        background: var(--gray-800);
+    }
+    
+    .filter-bar {
+        background: var(--bg-card);
+        border-radius: var(--radius-lg);
+        border: 1px solid var(--border);
+        padding: 1rem 1.25rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .btn-export {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.5rem 1rem;
+        background: linear-gradient(135deg, #10b981, #059669);
+        color: white;
+        border: none;
+        border-radius: var(--radius-md);
+        font-size: 0.8rem;
+        font-weight: 600;
+        text-decoration: none;
+        transition: var(--transition);
+    }
+    
+    .btn-export:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-md);
+    }
+    
+    .table-container {
+        background: var(--bg-card);
+        border-radius: var(--radius-lg);
+        border: 1px solid var(--border);
+        overflow: hidden;
+    }
+    
+    .data-table {
+        width: 100%;
+    }
+    
+    .data-table thead tr {
+        background: var(--gray-100);
+    }
+    
+    .data-table th {
+        padding: 1rem 1.25rem;
+        text-align: left;
+        font-size: 0.7rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: var(--text-secondary);
+        border-bottom: 1px solid var(--border);
+    }
+    
+    .data-table td {
+        padding: 1rem 1.25rem;
+        font-size: 0.85rem;
+        color: var(--text-primary);
+        border-bottom: 1px solid var(--border);
+        vertical-align: middle;
+    }
+    
+    .data-table tbody tr:hover {
+        background: var(--gray-100);
+    }
+    
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.25rem;
+        padding: 0.25rem 0.75rem;
+        border-radius: 50px;
+        font-size: 0.7rem;
+        font-weight: 600;
+    }
+    
+    .status-completed {
+        background: #d1fae5;
+        color: #059669;
+    }
+    
+    .status-expired {
+        background: #fee2e2;
+        color: #dc2626;
+    }
+    
+    .status-progress {
+        background: #dbeafe;
+        color: #2563eb;
+    }
+    
+    .status-pending {
+        background: #fef3c7;
+        color: #d97706;
+    }
+    
+    .btn-view {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.25rem;
+        padding: 0.3rem 0.6rem;
+        background: transparent;
+        border: 1px solid var(--border);
+        border-radius: var(--radius-sm);
+        color: var(--text-secondary);
+        font-size: 0.7rem;
+        text-decoration: none;
+        transition: var(--transition);
+    }
+    
+    .btn-view:hover {
+        border-color: var(--primary);
+        color: var(--primary);
+        background: var(--primary-bg);
+    }
+    
+    .empty-state {
+        text-align: center;
+        padding: 3rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="flow-header">
+    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+        <div>
+            <h1 style="font-size: 1.5rem; font-weight: 800; color: var(--text-primary); margin-bottom: 0.25rem;">
+                📁 Поток: {{ flow_name }}
+            </h1>
+            <p style="color: var(--text-secondary); font-size: 0.85rem;">
+                Список писем в данном потоке
+            </p>
+        </div>
+        <a href="/flows/{{ flow_name }}/export" class="btn-export">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 3v12m0 0-3-3m3 3 3-3M5 17v2a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-2"/>
+            </svg>
+            Экспорт в Excel
+        </a>
+    </div>
+    
+    <div class="flow-stats">
+        <div class="flow-stat">
+            <div style="font-size: 1.5rem; font-weight: 800;">{{ total }}</div>
+            <div style="font-size: 0.7rem; color: var(--text-secondary);">Всего писем</div>
+        </div>
+        <div class="flow-stat">
+            <div style="font-size: 1.5rem; font-weight: 800; color: #10b981;">{{ completed }}</div>
+            <div style="font-size: 0.7rem; color: var(--text-secondary);">Исполнено</div>
+        </div>
+        <div class="flow-stat">
+            <div style="font-size: 1.5rem; font-weight: 800; color: #f59e0b;">{{ in_progress }}</div>
+            <div style="font-size: 0.7rem; color: var(--text-secondary);">В работе</div>
+        </div>
+        <div class="flow-stat">
+            <div style="font-size: 1.5rem; font-weight: 800; color: var(--primary);">{{ progress_percent }}%</div>
+            <div style="font-size: 0.7rem; color: var(--text-secondary);">Выполнено</div>
+        </div>
+    </div>
+</div>
+
+<div class="table-container">
+    {% if correspondences %}
+    <div style="overflow-x: auto;">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>№</th>
+                    <th>Входящий номер</th>
+                    <th>Отправитель</th>
+                    <th>Содержание</th>
+                    <th>Исполнитель</th>
+                    <th>Срок</th>
+                    <th>Статус</th>
+                    <th>Действия</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for corr in correspondences %}
+                <tr>
+                    <td>{{ loop.index }}</td>
+                    <td style="font-weight: 600;">{{ corr.incoming_number }}</td>
+                    <td>{{ corr.sender[:40] }}{% if corr.sender|length > 40 %}...{% endif %}</td>
+                    <td>{{ corr.content[:60] }}{% if corr.content|length > 60 %}...{% endif %}</td>
+                    <td>{{ corr.executor.full_name if corr.executor else 'Не назначен' }}</td>
+                    <td>{{ corr.deadline.strftime('%d.%m.%Y') }}</td>
+                    <td>
+                        <span class="status-badge 
+                            {% if corr.status.value == 'Исполнено' %}status-completed
+                            {% elif corr.status.value == 'Просрочено' %}status-expired
+                            {% elif corr.status.value == 'В работе' %}status-progress
+                            {% else %}status-pending{% endif %}">
+                            {{ corr.status.value }}
+                        </span>
+                    </td>
+                    <td>
+                        <a href="/api/correspondences/{{ corr.id }}" class="btn-view">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                                <circle cx="12" cy="12" r="3"/>
+                            </svg>
+                            Просмотр
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="empty-state">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M4 4h16v16H4z"/>
+            <path d="M8 8h8M8 12h6M8 16h4"/>
+        </svg>
+        <p>В этом потоке пока нет писем</p>
+    </div>
+    {% endif %}
+</div>
+
+<div style="margin-top: 1rem;">
+    <a href="/flows/" class="btn-view" style="display: inline-flex;">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="19" y1="12" x2="5" y2="12"/>
+            <polyline points="12 19 5 12 12 5"/>
+        </svg>
+        Назад к списку потоков
+    </a>
+</div>
+{% endblock %}

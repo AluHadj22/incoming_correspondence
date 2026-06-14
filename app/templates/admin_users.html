@@ -1,0 +1,608 @@
+{% extends "base.html" %}
+
+{% block title %}Управление пользователями | Админ-панель{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Заголовок страницы */
+    .page-header {
+        margin-bottom: 1.5rem;
+    }
+    
+    .page-header h1 {
+        font-size: 1.5rem;
+        font-weight: 800;
+        color: var(--text-primary);
+        margin-bottom: 0.25rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .page-header h1 svg {
+        width: 28px;
+        height: 28px;
+        stroke: var(--primary);
+    }
+    
+    .page-header p {
+        color: var(--text-secondary);
+        font-size: 0.85rem;
+    }
+    
+    /* Панель фильтров */
+    .filter-bar {
+        background: var(--bg-card);
+        border-radius: var(--radius-lg);
+        border: 1px solid var(--border);
+        padding: 1.25rem 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .filter-form {
+        display: flex;
+        gap: 1rem;
+        align-items: flex-end;
+        flex-wrap: wrap;
+    }
+    
+    .filter-group {
+        flex: 1;
+        min-width: 180px;
+    }
+    
+    .filter-group label {
+        display: block;
+        font-size: 0.7rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: var(--text-secondary);
+        margin-bottom: 0.5rem;
+    }
+    
+    .filter-select {
+        width: 100%;
+        padding: 0.6rem 1rem;
+        background: var(--bg-main);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-md);
+        color: var(--text-primary);
+        font-size: 0.85rem;
+        transition: var(--transition);
+        cursor: pointer;
+    }
+    
+    .filter-select:focus {
+        outline: none;
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px var(--primary-bg);
+    }
+    
+    .filter-actions {
+        display: flex;
+        gap: 0.5rem;
+    }
+    
+    /* Кнопки фильтров */
+    .btn-filter {
+        padding: 0.6rem 1.25rem;
+        border-radius: var(--radius-md);
+        font-size: 0.8rem;
+        font-weight: 600;
+        transition: var(--transition);
+        cursor: pointer;
+        border: none;
+    }
+    
+    .btn-filter-primary {
+        background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+        color: white;
+    }
+    
+    .btn-filter-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-md);
+    }
+    
+    .btn-filter-secondary {
+        background: var(--gray-200);
+        color: var(--text-secondary);
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.25rem;
+    }
+    
+    [data-theme='dark'] .btn-filter-secondary {
+        background: var(--gray-800);
+        color: var(--text-secondary);
+    }
+    
+    .btn-filter-secondary:hover {
+        background: var(--gray-300);
+        color: var(--text-primary);
+    }
+    
+    /* Таблица */
+    .table-container {
+        background: var(--bg-card);
+        border-radius: var(--radius-lg);
+        border: 1px solid var(--border);
+        overflow: hidden;
+        margin-bottom: 1.5rem;
+    }
+    
+    .users-table {
+        width: 100%;
+    }
+    
+    .users-table thead tr {
+        background: var(--gray-100);
+    }
+    
+    [data-theme='dark'] .users-table thead tr {
+        background: var(--gray-800);
+    }
+    
+    .users-table th {
+        padding: 1rem 1.25rem;
+        text-align: left;
+        font-size: 0.7rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: var(--text-secondary);
+        border-bottom: 1px solid var(--border);
+    }
+    
+    .users-table td {
+        padding: 1rem 1.25rem;
+        font-size: 0.85rem;
+        color: var(--text-primary);
+        border-bottom: 1px solid var(--border);
+        vertical-align: middle;
+    }
+    
+    .users-table tbody tr {
+        transition: var(--transition);
+    }
+    
+    .users-table tbody tr:hover {
+        background: var(--gray-100);
+    }
+    
+    [data-theme='dark'] .users-table tbody tr:hover {
+        background: var(--gray-800);
+    }
+    
+    /* Бейджи статусов */
+    .badge-active {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.25rem;
+        padding: 0.25rem 0.75rem;
+        border-radius: 50px;
+        font-size: 0.7rem;
+        font-weight: 600;
+        background: #d1fae5;
+        color: #059669;
+    }
+    
+    .badge-blocked {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.25rem;
+        padding: 0.25rem 0.75rem;
+        border-radius: 50px;
+        font-size: 0.7rem;
+        font-weight: 600;
+        background: #fee2e2;
+        color: #dc2626;
+    }
+    
+    .badge-admin {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.25rem;
+        padding: 0.25rem 0.75rem;
+        border-radius: 50px;
+        font-size: 0.7rem;
+        font-weight: 600;
+        background: linear-gradient(135deg, #667eea20, #764ba220);
+        color: var(--primary);
+    }
+    
+    .badge-user {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.25rem;
+        padding: 0.25rem 0.75rem;
+        border-radius: 50px;
+        font-size: 0.7rem;
+        font-weight: 600;
+        background: var(--gray-200);
+        color: var(--text-secondary);
+    }
+    
+    [data-theme='dark'] .badge-user {
+        background: var(--gray-800);
+    }
+    
+    /* Кнопка просмотра */
+    .btn-view {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.25rem;
+        padding: 0.4rem 0.8rem;
+        background: transparent;
+        border: 1px solid var(--border);
+        border-radius: var(--radius-sm);
+        color: var(--text-secondary);
+        font-size: 0.7rem;
+        font-weight: 500;
+        text-decoration: none;
+        transition: var(--transition);
+    }
+    
+    .btn-view:hover {
+        border-color: var(--primary);
+        color: var(--primary);
+        background: var(--primary-bg);
+    }
+    
+    /* Кнопка создания */
+    .btn-create-user {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.7rem 1.25rem;
+        background: linear-gradient(135deg, #10b981, #059669);
+        color: white;
+        border: none;
+        border-radius: var(--radius-md);
+        font-size: 0.85rem;
+        font-weight: 600;
+        text-decoration: none;
+        transition: var(--transition);
+        cursor: pointer;
+    }
+    
+    .btn-create-user:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-md);
+    }
+    
+    /* Модальное окно */
+    .modal-overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.6);
+        backdrop-filter: blur(4px);
+        z-index: 1000;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .modal-overlay.show {
+        display: flex;
+    }
+    
+    .modal-content {
+        background: var(--bg-card);
+        border-radius: var(--radius-xl);
+        max-width: 500px;
+        width: 90%;
+        max-height: 90vh;
+        overflow-y: auto;
+        box-shadow: var(--shadow-xl);
+        animation: fadeInUp 0.3s ease-out;
+    }
+    
+    .modal-header {
+        padding: 1.25rem 1.5rem;
+        border-bottom: 1px solid var(--border);
+        background: linear-gradient(135deg, var(--primary-bg), transparent);
+    }
+    
+    .modal-header h3 {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: var(--text-primary);
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .modal-body {
+        padding: 1.5rem;
+    }
+    
+    .modal-actions {
+        display: flex;
+        gap: 1rem;
+        margin-top: 1.5rem;
+        padding-top: 1rem;
+        border-top: 1px solid var(--border);
+    }
+    
+    /* Пустое состояние */
+    .empty-state {
+        text-align: center;
+        padding: 3rem 2rem;
+    }
+    
+    .empty-state svg {
+        width: 64px;
+        height: 64px;
+        stroke: var(--text-secondary);
+        opacity: 0.5;
+        margin-bottom: 1rem;
+    }
+    
+    .empty-state h4 {
+        font-size: 1rem;
+        font-weight: 600;
+        color: var(--text-primary);
+        margin-bottom: 0.5rem;
+    }
+    
+    .empty-state p {
+        font-size: 0.85rem;
+        color: var(--text-secondary);
+    }
+    
+    /* Адаптивность */
+    @media (max-width: 768px) {
+        .filter-form {
+            flex-direction: column;
+            align-items: stretch;
+        }
+        
+        .filter-group {
+            width: 100%;
+        }
+        
+        .filter-actions {
+            justify-content: flex-end;
+        }
+        
+        .users-table th,
+        .users-table td {
+            padding: 0.75rem 1rem;
+        }
+        
+        .hide-mobile {
+            display: none;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+            <circle cx="12" cy="7" r="4"/>
+        </svg>
+        Управление пользователями
+    </h1>
+    <p>Просмотр, блокировка и управление учетными записями</p>
+</div>
+
+<!-- Панель фильтров -->
+<div class="filter-bar">
+    <form method="GET" action="/admin/users" class="filter-form">
+        <div class="filter-group">
+            <label for="department">Фильтр по отделу</label>
+            <select id="department" name="department" class="filter-select">
+                <option value="">Все отделы</option>
+                {% for dept in departments %}
+                <option value="{{ dept }}" {% if selected_department == dept %}selected{% endif %}>{{ dept }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        
+        <div class="filter-group">
+            <label for="is_active">Фильтр по статусу</label>
+            <select id="is_active" name="is_active" class="filter-select">
+                <option value="">Все статусы</option>
+                <option value="active" {% if selected_status == 'active' %}selected{% endif %}>Активные</option>
+                <option value="blocked" {% if selected_status == 'blocked' %}selected{% endif %}>Заблокированные</option>
+            </select>
+        </div>
+        
+        <div class="filter-actions">
+            <button type="submit" class="btn-filter btn-filter-primary">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: inline-block; margin-right: 0.25rem;">
+                    <polygon points="22 3 2 3 10 13 10 21 14 18 14 13 22 3"/>
+                </svg>
+                Применить
+            </button>
+            {% if selected_department or selected_status %}
+            <a href="/admin/users" class="btn-filter btn-filter-secondary">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: inline-block; margin-right: 0.25rem;">
+                    <line x1="18" y1="6" x2="6" y2="18"/>
+                    <line x1="6" y1="6" x2="18" y2="18"/>
+                </svg>
+                Сбросить
+            </a>
+            {% endif %}
+        </div>
+    </form>
+</div>
+
+<!-- Таблица пользователей -->
+<div class="table-container">
+    {% if users %}
+    <div style="overflow-x: auto;">
+        <table class="users-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Имя пользователя</th>
+                    <th>ФИО</th>
+                    <th class="hide-mobile">Email</th>
+                    <th>Отдел</th>
+                    <th class="hide-mobile">Телефон</th>
+                    <th>Статус</th>
+                    <th>Роль</th>
+                    <th class="hide-mobile">Дата регистрации</th>
+                    <th>Действия</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for user in users %}
+                <tr>
+                    <td style="font-weight: 600; color: var(--primary);">{{ user.id }}</td>
+                    <td>{{ user.username }}</td>
+                    <td>{{ user.full_name }}</td>
+                    <td class="hide-mobile">{{ user.email }}</td>
+                    <td>{{ user.department.value }}</td>
+                    <td class="hide-mobile">{{ user.phone_number or '—' }}</td>
+                    <td>
+                        {% if user.is_active %}
+                        <span class="badge-active">
+                            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                                <polyline points="20 6 9 17 4 12"/>
+                            </svg>
+                            Активен
+                        </span>
+                        {% else %}
+                        <span class="badge-blocked">
+                            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                                <line x1="18" y1="6" x2="6" y2="18"/>
+                                <line x1="6" y1="6" x2="18" y2="18"/>
+                            </svg>
+                            Заблокирован
+                        </span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if user.is_admin %}
+                        <span class="badge-admin">
+                            👑 Админ
+                        </span>
+                        {% else %}
+                        <span class="badge-user">
+                            👤 Пользователь
+                        </span>
+                        {% endif %}
+                    </td>
+                    <td class="hide-mobile">{{ user.created_at.strftime('%d.%m.%Y') }}</td>
+                    <td>
+                        <a href="/admin/users/{{ user.id }}" class="btn-view">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                                <circle cx="12" cy="12" r="3"/>
+                            </svg>
+                            Детали
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="empty-state">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+            <circle cx="12" cy="7" r="4"/>
+        </svg>
+        <h4>Пользователи не найдены</h4>
+        <p>Попробуйте изменить параметры фильтрации</p>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Кнопка создания пользователя -->
+<div style="margin-top: 0.5rem;">
+    <button onclick="showCreateForm()" class="btn-create-user">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="12" y1="5" x2="12" y2="19"/>
+            <line x1="5" y1="12" x2="19" y2="12"/>
+        </svg>
+        Создать пользователя
+    </button>
+</div>
+
+<!-- Модальное окно создания пользователя -->
+<div id="createUserModal" class="modal-overlay">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="12" y1="5" x2="12" y2="19"/>
+                    <line x1="5" y1="12" x2="19" y2="12"/>
+                </svg>
+                Создание пользователя
+            </h3>
+        </div>
+        <div class="modal-body">
+            <form action="/admin/users/create" method="POST" id="createUserForm">
+                <div class="form-group">
+                    <label>Email *</label>
+                    <input type="email" name="email" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label>Имя пользователя *</label>
+                    <input type="text" name="username" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label>ФИО *</label>
+                    <input type="text" name="full_name" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label>Пароль *</label>
+                    <input type="password" name="password" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label>Отдел *</label>
+                    <select name="department" class="form-control" required>
+                        <option value="">Выберите отдел</option>
+                        {% for dept in departments %}
+                        <option value="{{ dept }}">{{ dept }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Телефон</label>
+                    <input type="tel" name="phone_number" class="form-control" placeholder="+7XXXXXXXXXX">
+                </div>
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" name="is_admin" value="true"> Администратор
+                    </label>
+                </div>
+                <div class="modal-actions">
+                    <button type="submit" class="btn-filter btn-filter-primary">Создать</button>
+                    <button type="button" onclick="hideCreateForm()" class="btn-filter btn-filter-secondary">Отмена</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+function showCreateForm() {
+    document.getElementById('createUserModal').classList.add('show');
+}
+
+function hideCreateForm() {
+    document.getElementById('createUserModal').classList.remove('show');
+}
+
+// Закрытие модального окна при клике вне его
+document.getElementById('createUserModal').addEventListener('click', function(e) {
+    if (e.target === this) {
+        hideCreateForm();
+    }
+});
+</script>
+{% endblock %}

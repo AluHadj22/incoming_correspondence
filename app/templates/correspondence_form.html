@@ -1,0 +1,411 @@
+{% extends "base.html" %}
+
+{% block title %}{{ 'Редактирование письма' if is_edit else 'Создание письма' }} | Система учета корреспонденции{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Карточка формы */
+    .form-card {
+        background: var(--bg-card);
+        border-radius: var(--radius-xl);
+        border: 1px solid var(--border);
+        overflow: hidden;
+        margin-bottom: 1.5rem;
+    }
+    
+    .form-header {
+        padding: 1.5rem;
+        border-bottom: 1px solid var(--border);
+        background: linear-gradient(135deg, var(--primary-bg), transparent);
+    }
+    
+    .form-header h1 {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--text-primary);
+        margin-bottom: 0.25rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .form-header svg {
+        width: 28px;
+        height: 28px;
+        stroke: var(--primary);
+    }
+    
+    .form-header p {
+        color: var(--text-secondary);
+        font-size: 0.85rem;
+    }
+    
+    .form-body {
+        padding: 1.5rem;
+    }
+    
+    /* Сетка формы */
+    .form-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1.5rem;
+    }
+    
+    /* Группа полей */
+    .form-group {
+        margin-bottom: 1.25rem;
+    }
+    
+    .form-group label {
+        display: block;
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: var(--text-secondary);
+        margin-bottom: 0.5rem;
+    }
+    
+    .form-group label .required {
+        color: #ef4444;
+        margin-left: 0.25rem;
+    }
+    
+    .form-control {
+        width: 100%;
+        padding: 0.7rem 1rem;
+        background: var(--bg-main);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-md);
+        color: var(--text-primary);
+        font-size: 0.9rem;
+        transition: var(--transition);
+    }
+    
+    .form-control:focus {
+        outline: none;
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px var(--primary-bg);
+    }
+    
+    textarea.form-control {
+        resize: vertical;
+        min-height: 100px;
+    }
+    
+    select.form-control {
+        cursor: pointer;
+    }
+    
+    .form-hint {
+        display: block;
+        font-size: 0.7rem;
+        color: var(--text-secondary);
+        margin-top: 0.25rem;
+    }
+    
+    /* Ошибка */
+    .alert-error {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.875rem 1rem;
+        background: linear-gradient(135deg, #fee2e2, #fecaca);
+        color: #991b1b;
+        border-radius: var(--radius-md);
+        margin-bottom: 1.5rem;
+        border-left: 4px solid #ef4444;
+    }
+    
+    .alert-error svg {
+        width: 20px;
+        height: 20px;
+        stroke: #991b1b;
+        flex-shrink: 0;
+    }
+    
+    [data-theme='dark'] .alert-error {
+        background: #7f1d1d;
+        color: #fca5a5;
+    }
+    
+    [data-theme='dark'] .alert-error svg {
+        stroke: #fca5a5;
+    }
+    
+    /* Кнопки */
+    .form-actions {
+        display: flex;
+        gap: 1rem;
+        margin-top: 1.5rem;
+        padding-top: 1.5rem;
+        border-top: 1px solid var(--border);
+    }
+    
+    .btn-submit {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.7rem 1.5rem;
+        background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+        color: white;
+        border: none;
+        border-radius: var(--radius-md);
+        font-size: 0.9rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: var(--transition);
+    }
+    
+    .btn-submit:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-md);
+    }
+    
+    .btn-cancel {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.7rem 1.5rem;
+        background: var(--gray-200);
+        color: var(--text-secondary);
+        border: none;
+        border-radius: var(--radius-md);
+        font-size: 0.9rem;
+        font-weight: 600;
+        text-decoration: none;
+        transition: var(--transition);
+    }
+    
+    [data-theme='dark'] .btn-cancel {
+        background: var(--gray-800);
+        color: var(--text-secondary);
+    }
+    
+    .btn-cancel:hover {
+        background: var(--gray-300);
+        color: var(--text-primary);
+    }
+    
+    /* Разделитель */
+    .form-divider {
+        margin: 1rem 0 0.5rem;
+        font-size: 0.8rem;
+        font-weight: 600;
+        color: var(--text-secondary);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        border-bottom: 1px solid var(--border);
+        padding-bottom: 0.5rem;
+    }
+    
+    /* Адаптивность */
+    @media (max-width: 768px) {
+        .form-header {
+            padding: 1rem;
+        }
+        
+        .form-body {
+            padding: 1rem;
+        }
+        
+        .form-grid {
+            grid-template-columns: 1fr;
+            gap: 0;
+        }
+        
+        .form-actions {
+            flex-direction: column;
+        }
+        
+        .btn-submit,
+        .btn-cancel {
+            justify-content: center;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="form-card">
+    <div class="form-header">
+        <h1>
+            {% if is_edit %}
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                <path d="M17 3l4 4-7 7H10v-4l7-7z"/>
+                <path d="M4 20h16"/>
+            </svg>
+            ✏️ Редактирование письма
+            {% else %}
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                <line x1="12" y1="5" x2="12" y2="19"/>
+                <line x1="5" y1="12" x2="19" y2="12"/>
+            </svg>
+            📝 Создание нового письма
+            {% endif %}
+        </h1>
+        <p>{% if is_edit %}Измените данные письма{% else %}Заполните форму для создания нового письма{% endif %}</p>
+    </div>
+    
+    <div class="form-body">
+        {% if error %}
+        <div class="alert-error">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"/>
+                <line x1="12" y1="8" x2="12" y2="12"/>
+                <line x1="12" y1="16" x2="12.01" y2="16"/>
+            </svg>
+            <span>{{ error }}</span>
+        </div>
+        {% endif %}
+        
+        <form action="{{ '/api/correspondences/' + correspondence.id|string + '/edit' if is_edit else '/api/correspondences/create' }}" method="POST">
+            <div class="form-grid">
+                <!-- Левая колонка -->
+                <div>
+                    <div class="form-group">
+                        <label for="incoming_number">Входящий номер <span class="required">*</span></label>
+                        <input type="text" id="incoming_number" name="incoming_number" class="form-control" 
+                               value="{{ correspondence.incoming_number if correspondence else '' }}" required>
+                        <span class="form-hint">Пример: 642/07-25</span>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="incoming_date">Дата входящего документа <span class="required">*</span></label>
+                        <input type="date" id="incoming_date" name="incoming_date" class="form-control" 
+                               value="{{ correspondence.incoming_date.strftime('%Y-%m-%d') if correspondence and correspondence.incoming_date else '' }}" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="received_date">Дата поступления <span class="required">*</span></label>
+                        <input type="date" id="received_date" name="received_date" class="form-control" 
+                               value="{{ correspondence.received_date.strftime('%Y-%m-%d') if correspondence and correspondence.received_date else '' }}" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="sender">Отправитель <span class="required">*</span></label>
+                        <input type="text" id="sender" name="sender" class="form-control" 
+                               value="{{ correspondence.sender if correspondence else '' }}" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="content">Содержание <span class="required">*</span></label>
+                        <textarea id="content" name="content" class="form-control" rows="5" required>{{ correspondence.content if correspondence else '' }}</textarea>
+                    </div>
+                </div>
+                
+                <!-- Правая колонка -->
+                <div>
+                    <div class="form-group">
+                        <label for="deadline">Срок исполнения <span class="required">*</span></label>
+                        <input type="date" id="deadline" name="deadline" class="form-control" 
+                               value="{{ correspondence.deadline.strftime('%Y-%m-%d') if correspondence and correspondence.deadline else '' }}" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="executor_id">Исполнитель</label>
+                        <select id="executor_id" name="executor_id" class="form-control">
+                            <option value="">Не назначен</option>
+                            {% for user in users %}
+                            <option value="{{ user.id }}" {% if correspondence and correspondence.executor_id == user.id %}selected{% endif %}>
+                                {{ user.full_name }} ({{ user.department.value }})
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="status">Статус</label>
+                        <select id="status" name="status" class="form-control">
+                            {% for status_item in statuses %}
+                            <option value="{{ status_item }}" {% if correspondence and correspondence.status.value == status_item %}selected{% endif %}>
+                                {{ status_item }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <div class="form-divider">Дополнительная информация</div>
+                    
+                    <div class="form-group">
+                        <label for="sent_info">Отправлено</label>
+                        <input type="text" id="sent_info" name="sent_info" class="form-control" 
+                               value="{{ correspondence.sent_info if correspondence else '' }}">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="to_whom">Кому</label>
+                        <input type="text" id="to_whom" name="to_whom" class="form-control" 
+                               value="{{ correspondence.to_whom if correspondence else '' }}">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="control">Контроль</label>
+                        <input type="text" id="control" name="control" class="form-control" 
+                               value="{{ correspondence.control if correspondence else '' }}">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="report">Отчет</label>
+                        <input type="text" id="report" name="report" class="form-control" 
+                               value="{{ correspondence.report if correspondence else '' }}">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="report_date">Дата отчета</label>
+                        <input type="date" id="report_date" name="report_date" class="form-control" 
+                               value="{{ correspondence.report_date.strftime('%Y-%m-%d') if correspondence and correspondence.report_date else '' }}">
+                    </div>
+                    
+                    <div class="form-divider">📋 Письмо-запрос (для отчетности)</div>
+                    
+                    <div class="form-group">
+                        <label for="request_type">Тип запроса</label>
+                        <select id="request_type" name="request_type" class="form-control">
+                            <option value="">Не является запросом</option>
+                            {% for rt in request_types %}
+                            <option value="{{ rt.value }}" {% if correspondence and correspondence.request_type and correspondence.request_type.value == rt.value %}selected{% endif %}>
+                                {{ rt.label }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                        <span class="form-hint">Укажите, если письмо является запросом для отчетности</span>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="request_note">Примечание для отчетности по запросам</label>
+                        <textarea id="request_note" name="request_note" class="form-control" rows="3" placeholder="Укажите дополнительную информацию для отчетности...">{{ correspondence.request_note if correspondence else '' }}</textarea>
+                        <span class="form-hint">Необязательное поле. Используется для отчетности по запросам</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="form-actions">
+                <button type="submit" class="btn-submit">
+                    {% if is_edit %}
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/>
+                        <polyline points="17 21 17 13 7 13 7 21"/>
+                        <polyline points="7 3 7 8 15 8"/>
+                    </svg>
+                    Сохранить изменения
+                    {% else %}
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="12" y1="5" x2="12" y2="19"/>
+                        <line x1="5" y1="12" x2="19" y2="12"/>
+                    </svg>
+                    Создать письмо
+                    {% endif %}
+                </button>
+                <a href="{{ '/api/correspondences/' + correspondence.id|string if is_edit else '/api/correspondences/' }}" class="btn-cancel">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18"/>
+                        <line x1="6" y1="6" x2="18" y2="18"/>
+                    </svg>
+                    Отмена
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

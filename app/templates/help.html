@@ -1,0 +1,470 @@
+{% extends "base.html" %}
+
+{% block title %}Справка и инструкции | Система учета корреспонденции{% endblock %}
+
+{% block extra_css %}
+<style>
+    .help-header {
+        margin-bottom: 2rem;
+    }
+    
+    .help-header h1 {
+        font-size: 1.75rem;
+        font-weight: 800;
+        color: var(--text-primary);
+        margin-bottom: 0.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+    
+    .help-header h1 svg {
+        width: 32px;
+        height: 32px;
+        stroke: var(--primary);
+    }
+    
+    .help-header p {
+        color: var(--text-secondary);
+        font-size: 0.9rem;
+    }
+    
+    /* Сетка карточек инструкций */
+    .instructions-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+    
+    .instruction-card {
+        background: var(--bg-card);
+        border-radius: var(--radius-xl);
+        border: 1px solid var(--border);
+        overflow: hidden;
+        transition: var(--transition);
+    }
+    
+    .instruction-card:hover {
+        transform: translateY(-4px);
+        box-shadow: var(--shadow-lg);
+    }
+    
+    .card-header-category {
+        padding: 1.25rem 1.5rem;
+        border-bottom: 1px solid var(--border);
+    }
+    
+    .card-header-category h2 {
+        font-size: 1.2rem;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+    
+    .card-header-category .badge-category {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.25rem 0.75rem;
+        border-radius: 50px;
+        font-size: 0.7rem;
+        font-weight: 600;
+    }
+    
+    .badge-critical {
+        background: #fee2e2;
+        color: #dc2626;
+    }
+    
+    .badge-dsp {
+        background: #fef3c7;
+        color: #d97706;
+    }
+    
+    .badge-security {
+        background: #dbeafe;
+        color: #2563eb;
+    }
+    
+    [data-theme='dark'] .badge-critical {
+        background: #7f1d1d;
+        color: #f87171;
+    }
+    
+    [data-theme='dark'] .badge-dsp {
+        background: #78350f;
+        color: #fbbf24;
+    }
+    
+    [data-theme='dark'] .badge-security {
+        background: #1e3a5f;
+        color: #60a5fa;
+    }
+    
+    .card-body-instruction {
+        padding: 1.5rem;
+    }
+    
+    .instruction-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+    
+    .instruction-list li {
+        display: flex;
+        gap: 0.75rem;
+        margin-bottom: 1rem;
+        font-size: 0.9rem;
+        color: var(--text-primary);
+        line-height: 1.5;
+    }
+    
+    .instruction-list li:last-child {
+        margin-bottom: 0;
+    }
+    
+    .instruction-icon {
+        flex-shrink: 0;
+        width: 24px;
+        height: 24px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .instruction-icon.warning {
+        color: #dc2626;
+    }
+    
+    .instruction-icon.warning-light {
+        color: #f59e0b;
+    }
+    
+    .instruction-icon.info {
+        color: #2563eb;
+    }
+    
+    .instruction-icon.success {
+        color: #10b981;
+    }
+    
+    .instruction-text {
+        flex: 1;
+    }
+    
+    .instruction-text strong {
+        color: var(--primary);
+    }
+    
+    .instruction-text .highlight {
+        background: var(--primary-bg);
+        padding: 0.2rem 0.4rem;
+        border-radius: var(--radius-sm);
+        font-family: monospace;
+        font-size: 0.8rem;
+    }
+    
+    .warning-block {
+        background: linear-gradient(135deg, #fee2e2, #fecaca);
+        border-left: 4px solid #dc2626;
+        padding: 1rem;
+        border-radius: var(--radius-md);
+        margin-top: 1rem;
+    }
+    
+    .warning-block p {
+        margin: 0;
+        font-size: 0.85rem;
+        color: #991b1b;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    [data-theme='dark'] .warning-block {
+        background: #7f1d1d;
+    }
+    
+    [data-theme='dark'] .warning-block p {
+        color: #fca5a5;
+    }
+    
+    .info-block {
+        background: linear-gradient(135deg, #dbeafe, #bfdbfe);
+        border-left: 4px solid #2563eb;
+        padding: 1rem;
+        border-radius: var(--radius-md);
+        margin-top: 1rem;
+    }
+    
+    .info-block p {
+        margin: 0;
+        font-size: 0.85rem;
+        color: #1e3a8a;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    [data-theme='dark'] .info-block {
+        background: #1e3a5f;
+    }
+    
+    [data-theme='dark'] .info-block p {
+        color: #93c5fd;
+    }
+    
+    .divider {
+        height: 1px;
+        background: var(--border);
+        margin: 1rem 0;
+    }
+    
+    .footer-note {
+        background: var(--bg-card);
+        border-radius: var(--radius-lg);
+        border: 1px solid var(--border);
+        padding: 1.25rem 1.5rem;
+        text-align: center;
+    }
+    
+    .footer-note p {
+        color: var(--text-secondary);
+        font-size: 0.85rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+    }
+    
+    @media (max-width: 768px) {
+        .instructions-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .help-header h1 {
+            font-size: 1.3rem;
+        }
+        
+        .instruction-list li {
+            font-size: 0.8rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="help-header">
+    <h1>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+            <circle cx="12" cy="12" r="10"/>
+            <path d="M12 16v-4M12 8h.01"/>
+        </svg>
+        Справка и инструкции
+    </h1>
+    <p>Правила работы с входящей корреспонденцией разных категорий</p>
+</div>
+
+<div class="instructions-grid">
+    
+    <!-- 1. Письма потока /07-29 -->
+    <div class="instruction-card">
+        <div class="card-header-category">
+            <h2>
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                    <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+                </svg>
+                Письма /07-29 потока
+                <span class="badge-category badge-critical">⚠️ Критический поток</span>
+            </h2>
+        </div>
+        <div class="card-body-instruction">
+            <ul class="instruction-list">
+                <li>
+                    <div class="instruction-icon warning">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"/>
+                            <line x1="12" y1="8" x2="12" y2="12"/>
+                            <line x1="12" y1="16" x2="12.01" y2="16"/>
+                        </svg>
+                    </div>
+                    <div class="instruction-text">
+                        <strong>Письма не могут быть закрыты без ответа автору</strong> и копии <strong>Кадырову</strong>
+                    </div>
+                </li>
+                <li>
+                    <div class="instruction-icon warning">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M20 12v6a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h6"/>
+                            <path d="M16 3h5v5"/>
+                            <path d="M14 10l7-7"/>
+                        </svg>
+                    </div>
+                    <div class="instruction-text">
+                        <strong>Отвечает автору письма только тот, кто стоит на своде!</strong> Перед написанием ответа <strong class="highlight">обязательно проверьте</strong> — вы ли на своде.
+                    </div>
+                </li>
+                <li>
+                    <div class="instruction-icon info">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"/>
+                            <line x1="12" y1="12" x2="12" y2="16"/>
+                            <line x1="12" y1="8" x2="12.01" y2="8"/>
+                        </svg>
+                    </div>
+                    <div class="instruction-text">
+                        Ответ должен быть <strong>полным, аргументированным и по существу</strong> поставленного вопроса.
+                    </div>
+                </li>
+            </ul>
+            <div class="warning-block">
+                <p>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+                        <line x1="12" y1="9" x2="12" y2="13"/>
+                        <line x1="12" y1="17" x2="12.01" y2="17"/>
+                    </svg>
+                    ⚠️ Без ответа автору письмо считается НЕ ЗАКРЫТЫМ!
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. Письма ДСП -->
+    <div class="instruction-card">
+        <div class="card-header-category">
+            <h2>
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                    <rect x="3" y="3" width="18" height="18" rx="2"/>
+                    <path d="M8 7h8M8 12h6M8 17h4"/>
+                </svg>
+                Письма ДСП
+                <span class="badge-category badge-dsp">🔒 Для служебного пользования</span>
+            </h2>
+        </div>
+        <div class="card-body-instruction">
+            <ul class="instruction-list">
+                <li>
+                    <div class="instruction-icon warning-light">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M4 4h16v16H4z"/>
+                            <line x1="8" y1="8" x2="16" y2="16"/>
+                            <line x1="8" y1="16" x2="16" y2="8"/>
+                        </svg>
+                    </div>
+                    <div class="instruction-text">
+                        <strong>НЕЛЬЗЯ рассылать, прикреплять к общим письмам</strong> и передавать третьим лицам.
+                    </div>
+                </li>
+                <li>
+                    <div class="instruction-icon warning-light">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/>
+                            <circle cx="12" cy="12" r="3"/>
+                        </svg>
+                    </div>
+                    <div class="instruction-text">
+                        <strong>Действия по таким письмам должны быть согласованы с руководством</strong> и исходить исключительно из рациональной оценки содержания письма.
+                    </div>
+                </li>
+                <li>
+                    <div class="instruction-icon info">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M12 6v6l4 2"/>
+                            <circle cx="12" cy="12" r="10"/>
+                        </svg>
+                    </div>
+                    <div class="instruction-text">
+                        Хранить и учитывать ДСП-документы необходимо <strong>в отдельном защищённом порядке</strong>.
+                    </div>
+                </li>
+            </ul>
+            <div class="warning-block">
+                <p>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/>
+                        <circle cx="12" cy="12" r="3"/>
+                    </svg>
+                    🔒 НЕ РАССЫЛАТЬ! НЕ ПРИКРЕПЛЯТЬ! СОГЛАСОВАТЬ С РУКОВОДСТВОМ!
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 3. Письма от ФСБ, Военкомата и спецслужб -->
+    <div class="instruction-card">
+        <div class="card-header-category">
+            <h2>
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                    <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+                    <circle cx="12" cy="19" r="2"/>
+                </svg>
+                Письма ФСБ, Военкомата и спецслужб
+                <span class="badge-category badge-security">🛡️ Особый режим</span>
+            </h2>
+        </div>
+        <div class="card-body-instruction">
+            <ul class="instruction-list">
+                <li>
+                    <div class="instruction-icon warning">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+                        </svg>
+                    </div>
+                    <div class="instruction-text">
+                        <strong>Должны быть внимательно изучены</strong> и <strong>согласованы с руководством</strong>.
+                    </div>
+                </li>
+                <li>
+                    <div class="instruction-icon warning">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="18" y1="6" x2="6" y2="18"/>
+                            <line x1="6" y1="6" x2="18" y2="18"/>
+                        </svg>
+                    </div>
+                    <div class="instruction-text">
+                        <strong class="highlight">Письма ФСБ НЕЛЬЗЯ ПРИКРЕПЛЯТЬ В РАССЫЛКЕ!</strong> Запрещено любое копирование или пересылка содержимого.
+                    </div>
+                </li>
+                <li>
+                    <div class="instruction-icon info">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M20 12v6a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h6"/>
+                            <path d="M16 3h5v5"/>
+                            <path d="M14 10l7-7"/>
+                        </svg>
+                    </div>
+                    <div class="instruction-text">
+                        Работа с такими письмами ведётся <strong>строго в рамках компетенции</strong> и только <strong>уполномоченными лицами</strong>.
+                    </div>
+                </li>
+            </ul>
+            <div class="warning-block">
+                <p>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+                        <line x1="12" y1="9" x2="12" y2="13"/>
+                        <line x1="12" y1="17" x2="12.01" y2="17"/>
+                    </svg>
+                    🚫 ЗАПРЕЩЕНО! Не прикреплять, не копировать, не пересылать!
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Дополнительная информация -->
+<div class="footer-note">
+    <p>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+            <circle cx="12" cy="12" r="10"/>
+            <line x1="12" y1="16" x2="12" y2="12"/>
+            <line x1="12" y1="8" x2="12.01" y2="8"/>
+        </svg>
+        По всем вопросам, связанным с порядком работы с корреспонденцией, обращаться к руководителю отдела.
+    </p>
+</div>
+{% endblock %}

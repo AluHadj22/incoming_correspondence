@@ -1,0 +1,429 @@
+{% extends "base.html" %}
+
+{% block title %}Уведомления | Система учета корреспонденции{% endblock %}
+
+{% block extra_css %}
+<style>
+    .page-header {
+        margin-bottom: 1.5rem;
+    }
+    
+    .page-header h1 {
+        font-size: 1.5rem;
+        font-weight: 800;
+        color: var(--text-primary);
+        margin-bottom: 0.25rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .page-header h1 svg {
+        width: 28px;
+        height: 28px;
+        stroke: var(--primary);
+    }
+    
+    .alert-success {
+        background: linear-gradient(135deg, #d1fae5, #a7f3d0);
+        color: #065f46;
+        padding: 1rem;
+        border-radius: var(--radius-md);
+        margin-bottom: 1.5rem;
+        border-left: 4px solid #10b981;
+    }
+    
+    .alert-info {
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-lg);
+        padding: 1rem;
+        margin-bottom: 0.75rem;
+        transition: var(--transition);
+    }
+    
+    .alert-info:hover {
+        transform: translateX(4px);
+        box-shadow: var(--shadow-md);
+    }
+    
+    .notification-message {
+        margin-top: 0.5rem;
+        color: var(--text-primary);
+        font-size: 0.85rem;
+    }
+    
+    .notification-time {
+        font-size: 0.7rem;
+        color: var(--text-secondary);
+    }
+    
+    .notification-type {
+        font-size: 0.65rem;
+        color: var(--text-secondary);
+        margin-top: 0.25rem;
+    }
+    
+    .btn-sm {
+        padding: 0.4rem 0.8rem;
+        font-size: 0.7rem;
+    }
+    
+    .btn-primary {
+        background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+        color: white;
+        border: none;
+        border-radius: var(--radius-md);
+        cursor: pointer;
+        transition: var(--transition);
+    }
+    
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-md);
+    }
+    
+    .card {
+        background: var(--bg-card);
+        border-radius: var(--radius-lg);
+        border: 1px solid var(--border);
+        padding: 1.25rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .card-title {
+        font-size: 1rem;
+        font-weight: 700;
+        color: var(--text-primary);
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .badge-status {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.25rem;
+        padding: 0.25rem 0.75rem;
+        border-radius: 50px;
+        font-size: 0.7rem;
+        font-weight: 600;
+    }
+    
+    .badge-pending {
+        background: #fef3c7;
+        color: #d97706;
+    }
+    
+    .badge-completed {
+        background: #d1fae5;
+        color: #059669;
+    }
+    
+    .badge-expired {
+        background: #fee2e2;
+        color: #dc2626;
+    }
+    
+    .badge-progress {
+        background: #dbeafe;
+        color: #2563eb;
+    }
+    
+    [data-theme='dark'] .badge-pending {
+        background: #78350f;
+        color: #fbbf24;
+    }
+    
+    [data-theme='dark'] .badge-completed {
+        background: #064e3b;
+        color: #34d399;
+    }
+    
+    [data-theme='dark'] .badge-expired {
+        background: #7f1d1d;
+        color: #f87171;
+    }
+    
+    [data-theme='dark'] .badge-progress {
+        background: #1e3a5f;
+        color: #60a5fa;
+    }
+    
+    .deadline-urgent {
+        color: #dc2626;
+        font-weight: 700;
+    }
+    
+    .schedule-info {
+        margin-top: 1rem;
+        padding: 0.75rem;
+        background: var(--gray-100);
+        border-radius: var(--radius-md);
+    }
+    
+    [data-theme='dark'] .schedule-info {
+        background: var(--gray-800);
+    }
+    
+    .schedule-header {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-bottom: 0.5rem;
+    }
+    
+    .schedule-header svg {
+        width: 16px;
+        height: 16px;
+        stroke: var(--primary);
+    }
+    
+    .schedule-header span {
+        font-size: 0.8rem;
+        font-weight: 500;
+    }
+    
+    .schedule-times {
+        margin-top: 0.5rem;
+        font-size: 0.75rem;
+        color: var(--text-secondary);
+    }
+    
+    .next-run {
+        margin-top: 0.25rem;
+        font-size: 0.7rem;
+        color: var(--text-secondary);
+    }
+    
+    .table {
+        width: 100%;
+    }
+    
+    .table th {
+        text-align: left;
+        padding: 0.75rem;
+        font-size: 0.7rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        color: var(--text-secondary);
+        border-bottom: 1px solid var(--border);
+    }
+    
+    .table td {
+        padding: 0.75rem;
+        font-size: 0.85rem;
+        color: var(--text-primary);
+        border-bottom: 1px solid var(--border);
+    }
+    
+    .btn-view {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.25rem;
+        padding: 0.3rem 0.6rem;
+        background: transparent;
+        border: 1px solid var(--border);
+        border-radius: var(--radius-sm);
+        color: var(--text-secondary);
+        font-size: 0.7rem;
+        text-decoration: none;
+        transition: var(--transition);
+    }
+    
+    .btn-view:hover {
+        border-color: var(--primary);
+        color: var(--primary);
+        background: var(--primary-bg);
+    }
+    
+    @media (max-width: 768px) {
+        .table th, .table td {
+            padding: 0.5rem;
+        }
+        
+        .hide-mobile {
+            display: none;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+            <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+        </svg>
+        Уведомления
+    </h1>
+    <p>Центр управления уведомлениями</p>
+</div>
+
+<!-- Непрочитанные уведомления -->
+<div class="card">
+    <div class="card-title">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+            <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/>
+        </svg>
+        📬 Непрочитанные уведомления
+    </div>
+    
+    {% if unread_notifications %}
+    <div style="margin-bottom: 1rem;">
+        <button onclick="markAllRead()" class="btn-primary btn-sm" style="padding: 0.5rem 1rem;">
+            📖 Отметить все как прочитанные
+        </button>
+    </div>
+    
+    <div style="max-height: 400px; overflow-y: auto;">
+        {% for notification in unread_notifications %}
+        <div class="alert-info">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                <div style="flex: 1;">
+                    <div class="notification-time">{{ notification.sent_at.strftime('%d.%m.%Y %H:%M') }}</div>
+                    <div class="notification-message">{{ notification.message }}</div>
+                    <div class="notification-type">Тип: {{ notification.notification_type }}</div>
+                </div>
+                <button onclick="markRead({{ notification.id }})" class="btn-primary btn-sm" style="margin-left: 1rem;">✓ Прочитано</button>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <p>Нет непрочитанных уведомлений</p>
+    {% endif %}
+</div>
+
+<!-- Письма с приближающимся сроком -->
+<div class="card">
+    <div class="card-title">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+            <circle cx="12" cy="12" r="10"/>
+            <polyline points="12 6 12 12 16 14"/>
+        </svg>
+        ⚠️ Письма с приближающимся сроком (до 5 дней)
+    </div>
+    
+    {% if near_deadline_correspondences %}
+    <div style="overflow-x: auto;">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>№</th>
+                    <th>Отправитель</th>
+                    <th>Содержание</th>
+                    <th>Срок</th>
+                    <th>Осталось дней</th>
+                    <th>Статус</th>
+                    <th>Действия</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for corr in near_deadline_correspondences %}
+                <tr>
+                    <td>{{ corr.incoming_number }}</td>
+                    <td>{{ corr.sender[:40] }}{% if corr.sender|length > 40 %}...{% endif %}</td>
+                    <td>{{ corr.content[:60] }}{% if corr.content|length > 60 %}...{% endif %}</td>
+                    <td class="deadline-urgent">{{ corr.deadline.strftime('%d.%m.%Y') }}</td>
+                    <td class="deadline-urgent">{{ (corr.deadline - today).days }}</td>
+                    <td>
+                        <span class="badge-status 
+                            {% if corr.status.value == 'Исполнено' %}badge-completed
+                            {% elif corr.status.value == 'Просрочено' %}badge-expired
+                            {% elif corr.status.value == 'В работе' %}badge-progress
+                            {% else %}badge-pending{% endif %}">
+                            {{ corr.status.value }}
+                        </span>
+                    </td>
+                    <td>
+                        <a href="/api/correspondences/{{ corr.id }}" class="btn-view">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                                <circle cx="12" cy="12" r="3"/>
+                            </svg>
+                            Просмотр
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <p>Нет писем с приближающимся сроком</p>
+    {% endif %}
+</div>
+
+<!-- Ручной запуск проверки -->
+<div class="card">
+    <div class="card-title">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+            <circle cx="12" cy="12" r="3"/>
+        </svg>
+        🔄 Ручная проверка уведомлений
+    </div>
+    <button onclick="triggerCheck()" class="btn-primary btn-sm">Запустить проверку сейчас</button>
+    
+    <div class="schedule-info">
+        <div class="schedule-header">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"/>
+                <polyline points="12 6 12 12 16 14"/>
+            </svg>
+            <span>Расписание автоматических уведомлений:</span>
+        </div>
+        <div class="schedule-times">
+            📅 Ежедневно в <strong>9:00, 12:00, 16:00</strong>
+        </div>
+        <div class="next-run">
+            ⏰ Следующая отправка: <strong>{{ next_run }}</strong>
+        </div>
+    </div>
+</div>
+
+<script>
+async function markRead(notificationId) {
+    try {
+        const response = await fetch(`/notifications/${notificationId}/mark-read`, {
+            method: 'POST'
+        });
+        if (response.ok) {
+            location.reload();
+        }
+    } catch (e) {
+        console.error('Ошибка:', e);
+    }
+}
+
+async function markAllRead() {
+    try {
+        const response = await fetch('/notifications/mark-all-read', {
+            method: 'POST'
+        });
+        if (response.ok) {
+            location.reload();
+        }
+    } catch (e) {
+        console.error('Ошибка:', e);
+    }
+}
+
+async function triggerCheck() {
+    try {
+        const response = await fetch('/notifications/trigger-check', {
+            method: 'POST'
+        });
+        const data = await response.json();
+        alert(`Проверка выполнена! Отправлено ${data.notified_count} уведомлений.`);
+        location.reload();
+    } catch (e) {
+        console.error('Ошибка:', e);
+        alert('Ошибка при проверке уведомлений');
+    }
+}
+</script>
+{% endblock %}

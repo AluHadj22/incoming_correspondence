@@ -1,0 +1,474 @@
+{% extends "base.html" %}
+
+{% block title %}Админ-панель | Система учета корреспонденции{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Заголовок страницы */
+    .page-header {
+        margin-bottom: 2rem;
+    }
+    
+    .page-header h1 {
+        font-size: 1.75rem;
+        font-weight: 800;
+        color: var(--text-primary);
+        margin-bottom: 0.25rem;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+    
+    .page-header h1 svg {
+        width: 32px;
+        height: 32px;
+        stroke: var(--primary);
+    }
+    
+    .page-header p {
+        color: var(--text-secondary);
+        font-size: 0.85rem;
+    }
+    
+    /* Сетка статистики */
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 1.25rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .stat-card {
+        background: var(--bg-card);
+        border-radius: var(--radius-lg);
+        padding: 1.25rem;
+        transition: var(--transition);
+        border: 1px solid var(--border);
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .stat-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background: linear-gradient(90deg, var(--primary), var(--secondary));
+    }
+    
+    .stat-card:hover {
+        transform: translateY(-4px);
+        box-shadow: var(--shadow-lg);
+    }
+    
+    .stat-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 0.75rem;
+    }
+    
+    .stat-icon {
+        width: 44px;
+        height: 44px;
+        border-radius: var(--radius-md);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: var(--primary-bg);
+    }
+    
+    .stat-icon svg {
+        width: 22px;
+        height: 22px;
+        stroke: var(--primary);
+    }
+    
+    .stat-number {
+        font-size: 2rem;
+        font-weight: 800;
+        color: var(--text-primary);
+        line-height: 1.2;
+        margin-bottom: 0.25rem;
+    }
+    
+    .stat-label {
+        font-size: 0.7rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: var(--text-secondary);
+    }
+    
+    .stat-trend {
+        font-size: 0.7rem;
+        margin-top: 0.5rem;
+        color: var(--text-secondary);
+    }
+    
+    /* Секция управления */
+    .management-card {
+        background: var(--bg-card);
+        border-radius: var(--radius-lg);
+        border: 1px solid var(--border);
+        overflow: hidden;
+        margin-top: 1rem;
+    }
+    
+    .management-header {
+        padding: 1.25rem 1.5rem;
+        border-bottom: 1px solid var(--border);
+        background: var(--gray-100);
+    }
+    
+    [data-theme='dark'] .management-header {
+        background: var(--gray-800);
+    }
+    
+    .management-header h3 {
+        font-size: 1rem;
+        font-weight: 700;
+        color: var(--text-primary);
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .management-header h3 svg {
+        width: 20px;
+        height: 20px;
+        stroke: var(--primary);
+    }
+    
+    .management-body {
+        padding: 1.5rem;
+    }
+    
+    /* Кнопки управления */
+    .action-buttons {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+    
+    .btn-admin {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.7rem 1.25rem;
+        border-radius: var(--radius-md);
+        font-size: 0.85rem;
+        font-weight: 600;
+        text-decoration: none;
+        transition: var(--transition);
+        cursor: pointer;
+        border: none;
+    }
+    
+    .btn-admin-users {
+        background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+        color: white;
+    }
+    
+    .btn-admin-users:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-md);
+    }
+    
+    .btn-admin-letters {
+        background: linear-gradient(135deg, #10b981, #059669);
+        color: white;
+    }
+    
+    .btn-admin-letters:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-md);
+    }
+    
+    .btn-admin-notifications {
+        background: linear-gradient(135deg, #f59e0b, #d97706);
+        color: white;
+    }
+    
+    .btn-admin-notifications:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-md);
+    }
+    
+    .btn-admin-export {
+        background: linear-gradient(135deg, #2563eb, #1d4ed8);
+        color: white;
+    }
+    
+    .btn-admin-export:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-md);
+    }
+    
+    /* Адаптивность */
+    @media (max-width: 768px) {
+        .stats-grid {
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 1rem;
+        }
+        
+        .stat-number {
+            font-size: 1.5rem;
+        }
+        
+        .stat-icon {
+            width: 36px;
+            height: 36px;
+        }
+        
+        .stat-icon svg {
+            width: 18px;
+            height: 18px;
+        }
+        
+        .management-header {
+            padding: 1rem;
+        }
+        
+        .management-body {
+            padding: 1rem;
+        }
+        
+        .action-buttons {
+            flex-direction: column;
+        }
+        
+        .btn-admin {
+            justify-content: center;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+            <circle cx="12" cy="7" r="4"/>
+            <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+            <path d="M20 21v-2a4 4 0 0 0-4-4"/>
+        </svg>
+        Админ-панель
+    </h1>
+    <p>Управление пользователями и мониторинг системы</p>
+</div>
+
+<!-- Статистика пользователей -->
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-header">
+            <div class="stat-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                    <circle cx="12" cy="7" r="4"/>
+                </svg>
+            </div>
+        </div>
+        <div class="stat-number">{{ stats.total_users }}</div>
+        <div class="stat-label">Всего пользователей</div>
+        <div class="stat-trend">Зарегистрировано в системе</div>
+    </div>
+    
+    <div class="stat-card">
+        <div class="stat-header">
+            <div class="stat-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                    <circle cx="12" cy="7" r="4"/>
+                    <path d="M12 11v4"/>
+                </svg>
+            </div>
+        </div>
+        <div class="stat-number">{{ stats.active_users }}</div>
+        <div class="stat-label">Активные</div>
+        <div class="stat-trend" style="color: #10b981;">✅ Действующие аккаунты</div>
+    </div>
+    
+    <div class="stat-card">
+        <div class="stat-header">
+            <div class="stat-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                    <circle cx="12" cy="7" r="4"/>
+                    <line x1="18" y1="8" x2="22" y2="12"/>
+                    <line x1="22" y1="8" x2="18" y2="12"/>
+                </svg>
+            </div>
+        </div>
+        <div class="stat-number">{{ stats.blocked_users }}</div>
+        <div class="stat-label">Заблокированные</div>
+        <div class="stat-trend" style="color: #ef4444;">🔒 Доступ ограничен</div>
+    </div>
+    
+    <div class="stat-card">
+        <div class="stat-header">
+            <div class="stat-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                    <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+                </svg>
+            </div>
+        </div>
+        <div class="stat-number">{{ stats.admin_count }}</div>
+        <div class="stat-label">Администраторы</div>
+        <div class="stat-trend" style="color: var(--primary);">👑 Имеют полный доступ</div>
+    </div>
+</div>
+
+<!-- Статистика по отделам -->
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-header">
+            <div class="stat-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2h-5v-8H9v8H4a2 2 0 0 1-2-2z"/>
+                </svg>
+            </div>
+        </div>
+        <div class="stat-number">{{ stats.school_dept_count }}</div>
+        <div class="stat-label">Школьный отдел</div>
+        <div class="stat-trend">Сотрудников в отделе</div>
+    </div>
+    
+    <div class="stat-card">
+        <div class="stat-header">
+            <div class="stat-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                    <path d="M4 4h16v16H4z"/>
+                    <path d="M8 8h8M8 12h6M8 16h4"/>
+                </svg>
+            </div>
+        </div>
+        <div class="stat-number">{{ stats.gia_dept_count }}</div>
+        <div class="stat-label">Отдел ГИА</div>
+        <div class="stat-trend">Сотрудников в отделе</div>
+    </div>
+    
+    <div class="stat-card">
+        <div class="stat-header">
+            <div class="stat-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                    <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+                </svg>
+            </div>
+        </div>
+        <div class="stat-number">{{ stats.departement_count }}</div>
+        <div class="stat-label">Департмент</div>
+        <div class="stat-trend">Руководящий состав</div>
+    </div>
+</div>
+
+<!-- Статистика по письмам -->
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-header">
+            <div class="stat-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                    <path d="M4 4h16v16H4z"/>
+                    <path d="M8 8h8M8 12h6M8 16h4"/>
+                </svg>
+            </div>
+        </div>
+        <div class="stat-number">{{ stats.total_correspondences }}</div>
+        <div class="stat-label">Всего писем</div>
+        <div class="stat-trend">Документов в системе</div>
+    </div>
+    
+    <div class="stat-card">
+        <div class="stat-header">
+            <div class="stat-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                    <polyline points="22 4 12 14.01 9 11.01"/>
+                </svg>
+            </div>
+        </div>
+        <div class="stat-number">{{ stats.completed_correspondences }}</div>
+        <div class="stat-label">Исполнено</div>
+        <div class="stat-trend" style="color: #10b981;">✅ Успешно завершено</div>
+    </div>
+    
+    <div class="stat-card">
+        <div class="stat-header">
+            <div class="stat-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                    <circle cx="12" cy="12" r="10"/>
+                    <polyline points="12 6 12 12 16 14"/>
+                </svg>
+            </div>
+        </div>
+        <div class="stat-number">{{ stats.pending_correspondences }}</div>
+        <div class="stat-label">В ожидании</div>
+        <div class="stat-trend" style="color: #f59e0b;">⏳ Требуют внимания</div>
+    </div>
+</div>
+
+<!-- Управление -->
+<div class="management-card">
+    <div class="management-header">
+        <h3>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/>
+                <circle cx="12" cy="12" r="3"/>
+            </svg>
+            🔧 Управление системой
+        </h3>
+    </div>
+    <div class="management-body">
+        <div class="action-buttons">
+            <a href="/admin/users" class="btn-admin btn-admin-users">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                    <circle cx="12" cy="7" r="4"/>
+                </svg>
+                👥 Управление пользователями
+            </a>
+            <a href="/api/correspondences/" class="btn-admin btn-admin-letters">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M4 4h16v16H4z"/>
+                    <path d="M8 8h8M8 12h6M8 16h4"/>
+                </svg>
+                📋 Все письма
+            </a>
+            <a href="/api/correspondences/export" class="btn-admin btn-admin-export">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 3v12m0 0-3-3m3 3 3-3M5 17v2a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-2"/>
+                </svg>
+                📊 Экспорт всех писем
+            </a>
+            <a href="/notifications/check" class="btn-admin btn-admin-notifications">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+                    <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+                </svg>
+                🔔 Уведомления
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Анимация появления карточек
+        const cards = document.querySelectorAll('.stat-card, .management-card');
+        cards.forEach((card, index) => {
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(20px)';
+            setTimeout(() => {
+                card.style.transition = 'all 0.4s ease-out';
+                card.style.opacity = '1';
+                card.style.transform = 'translateY(0)';
+            }, index * 50);
+        });
+    });
+</script>
+{% endblock %}
