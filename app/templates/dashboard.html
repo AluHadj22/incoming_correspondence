@@ -276,10 +276,10 @@
 <!-- Приветственная секция -->
 <div style="margin-bottom: 2rem;">
     <h1 style="font-size: 1.75rem; font-weight: 800; color: var(--text-primary); margin-bottom: 0.25rem;">
-        👋 С возвращением, {{ current_user.full_name.split()[0] }}!
+        👋 {{ current_user.full_name.split()[0] }} - терпи
     </h1>
     <p style="color: var(--text-secondary);">
-        Вот сводка по вашей корреспонденции за сегодня.
+        Вот сводка по вашей корреспонденции(кто тебе на вы еще будет обращаться?).
     </p>
 </div>
 
@@ -324,7 +324,7 @@
         </div>
         <div class="stat-value">{{ stats.completed_count }}</div>
         <div class="stat-label">Исполнено</div>
-        <div class="stat-trend">Успешно завершено</div>
+        <div class="stat-trend">Успешно завершено - самому не смешно?</div>
     </div>
     
     <div class="stat-card">
@@ -339,7 +339,7 @@
         </div>
         <div class="stat-value">{{ stats.near_deadline_count }}</div>
         <div class="stat-label">Скоро срок</div>
-        <div class="stat-trend" style="color: var(--accent);">⚠️ Требуют внимания</div>
+        <div class="stat-trend" style="color: var(--accent);">⚠️ Какой пример ты подаешь? Закрой письма со сроком</div>
     </div>
 </div>
 
@@ -470,7 +470,7 @@
             <path d="M8 8h8M8 12h6M8 16h4"/>
         </svg>
         <h4>Нет писем</h4>
-        <p>У вас пока нет ни одного письма в системе</p>
+        <p>У вас пока нет ни одного письма в системе - но скоро это исправят...поверь...</p>
         <a href="/api/correspondences/create" class="btn-outline btn-sm" style="display: inline-flex; align-items: center; gap: 0.25rem; text-decoration: none; margin-top: 0.5rem;">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <line x1="12" y1="5" x2="12" y2="19"/>
