@@ -1,109 +1,116 @@
 {% extends "base.html" %}
 
-{% block title %}Письмо №{{ correspondence.incoming_number }} | Система учета корреспонденции{% endblock %}
+{% block title %}Документ №{{ correspondence.incoming_number }} | CorpoFlow{% endblock %}
 
 {% block extra_css %}
 <style>
-    /* Карточка письма */
     .detail-card {
         background: var(--bg-card);
         border-radius: var(--radius-xl);
-        border: 1px solid var(--border);
+        border: 1px solid var(--border-light);
         overflow: hidden;
         margin-bottom: 1.5rem;
     }
     
     .detail-header {
-        padding: 1.5rem;
-        border-bottom: 1px solid var(--border);
-        background: linear-gradient(135deg, var(--primary-bg), transparent);
+        padding: 1.25rem 1.5rem;
+        border-bottom: 1px solid var(--border-light);
+        background: var(--primary-bg);
     }
     
     .detail-header h1 {
-        font-size: 1.5rem;
-        font-weight: 700;
+        font-size: 1.35rem;
+        font-weight: 600;
         color: var(--text-primary);
         margin-bottom: 0.25rem;
         display: flex;
         align-items: center;
         gap: 0.5rem;
+        letter-spacing: -0.3px;
     }
     
     .detail-header svg {
-        width: 28px;
-        height: 28px;
+        width: 24px;
+        height: 24px;
         stroke: var(--primary);
     }
     
     .detail-header p {
-        color: var(--text-secondary);
-        font-size: 0.85rem;
+        color: var(--text-muted);
+        font-size: 0.8rem;
     }
     
     .detail-body {
         padding: 1.5rem;
     }
     
-    /* Информационные блоки */
     .info-section {
-        margin-bottom: 1.5rem;
+        margin-bottom: 1.75rem;
     }
     
     .info-section h3 {
-        font-size: 1rem;
-        font-weight: 700;
+        font-size: 0.85rem;
+        font-weight: 600;
         color: var(--text-primary);
         margin-bottom: 1rem;
         padding-bottom: 0.5rem;
         border-bottom: 2px solid var(--primary);
         display: inline-block;
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
     }
     
     .info-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-        gap: 1.25rem;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 1rem;
     }
     
     .info-item {
         display: flex;
         flex-direction: column;
         gap: 0.25rem;
+        padding: 0.75rem;
+        background: var(--primary-bg);
+        border-radius: var(--radius-md);
+        border: 1px solid var(--border-light);
     }
     
     .info-label {
-        font-size: 0.7rem;
+        font-size: 0.65rem;
         font-weight: 600;
         text-transform: uppercase;
-        letter-spacing: 0.5px;
-        color: var(--text-secondary);
+        letter-spacing: 0.4px;
+        color: var(--text-muted);
     }
     
     .info-value {
-        font-size: 0.9rem;
+        font-size: 0.85rem;
         font-weight: 500;
         color: var(--text-primary);
         word-break: break-word;
+        line-height: 1.4;
     }
     
-    .info-value-urgent {
-        color: var(--accent);
-        font-weight: 700;
+    .deadline-warning {
+        color: var(--warning);
+        font-weight: 600;
+        margin-left: 0.5rem;
     }
     
-    .info-value-expired {
-        color: #dc2626;
-        font-weight: 700;
+    .deadline-expired {
+        color: var(--danger);
+        font-weight: 600;
+        margin-left: 0.5rem;
     }
     
-    /* Бейджи статусов */
     .status-badge-large {
         display: inline-flex;
         align-items: center;
         gap: 0.5rem;
-        padding: 0.5rem 1rem;
+        padding: 0.35rem 1rem;
         border-radius: 50px;
-        font-size: 0.85rem;
+        font-size: 0.75rem;
         font-weight: 600;
     }
     
@@ -157,107 +164,103 @@
         color: #a78bfa;
     }
     
-    /* Таблица истории передач */
     .history-table {
         width: 100%;
     }
     
     .history-table thead tr {
-        background: var(--gray-100);
-    }
-    
-    [data-theme='dark'] .history-table thead tr {
-        background: var(--gray-800);
+        background: var(--primary-bg);
     }
     
     .history-table th {
         padding: 0.75rem 1rem;
         text-align: left;
-        font-size: 0.7rem;
-        font-weight: 700;
+        font-size: 0.65rem;
+        font-weight: 600;
         text-transform: uppercase;
         letter-spacing: 0.5px;
-        color: var(--text-secondary);
+        color: var(--text-muted);
+        border-bottom: 1px solid var(--border-light);
     }
     
     .history-table td {
         padding: 0.75rem 1rem;
-        font-size: 0.85rem;
+        font-size: 0.8rem;
         color: var(--text-primary);
-        border-bottom: 1px solid var(--border);
+        border-bottom: 1px solid var(--border-light);
+    }
+    
+    .history-table tbody tr {
+        transition: var(--transition);
     }
     
     .history-table tbody tr:hover {
-        background: var(--gray-100);
+        background: var(--primary-bg);
     }
     
-    [data-theme='dark'] .history-table tbody tr:hover {
-        background: var(--gray-800);
-    }
-    
-    /* Форма передачи */
     .transfer-form {
         display: flex;
         flex-wrap: wrap;
         gap: 0.75rem;
-        align-items: center;
-        background: var(--gray-100);
+        align-items: flex-end;
+        background: var(--primary-bg);
         padding: 1rem;
         border-radius: var(--radius-lg);
-        margin-top: 1rem;
+        margin-top: 0.5rem;
+        border: 1px solid var(--border-light);
     }
     
-    [data-theme='dark'] .transfer-form {
-        background: var(--gray-800);
-    }
-    
-    .transfer-select {
+    .transfer-group {
         flex: 2;
-        min-width: 200px;
-        padding: 0.6rem 1rem;
-        background: var(--bg-card);
-        border: 1px solid var(--border);
-        border-radius: var(--radius-md);
-        color: var(--text-primary);
-        font-size: 0.85rem;
+        min-width: 180px;
     }
     
+    .transfer-group label {
+        display: block;
+        font-size: 0.65rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+        color: var(--text-muted);
+        margin-bottom: 0.25rem;
+    }
+    
+    .transfer-select,
     .transfer-input {
-        flex: 1;
-        min-width: 150px;
-        padding: 0.6rem 1rem;
+        width: 100%;
+        padding: 0.55rem 0.85rem;
         background: var(--bg-card);
-        border: 1px solid var(--border);
+        border: 1px solid var(--border-light);
         border-radius: var(--radius-md);
         color: var(--text-primary);
         font-size: 0.85rem;
+        transition: var(--transition);
     }
     
-    .transfer-input:focus,
-    .transfer-select:focus {
+    .transfer-select:focus,
+    .transfer-input:focus {
         outline: none;
         border-color: var(--primary);
-        box-shadow: 0 0 0 3px var(--primary-bg);
+        box-shadow: var(--shadow-focus);
     }
     
-    /* Кнопки действий */
     .action-buttons {
         display: flex;
         flex-wrap: wrap;
         gap: 0.75rem;
         margin-top: 1.5rem;
         padding-top: 1.5rem;
-        border-top: 1px solid var(--border);
+        border-top: 1px solid var(--border-light);
     }
     
     .btn-action {
         display: inline-flex;
         align-items: center;
         gap: 0.5rem;
-        padding: 0.6rem 1.25rem;
+        padding: 0.55rem 1.25rem;
         border-radius: var(--radius-md);
-        font-size: 0.85rem;
-        font-weight: 600;
+        font-size: 0.8rem;
+        font-weight: 500;
         text-decoration: none;
         transition: var(--transition);
         cursor: pointer;
@@ -265,48 +268,49 @@
     }
     
     .btn-edit {
-        background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+        background: var(--primary);
         color: white;
     }
     
     .btn-edit:hover {
-        transform: translateY(-2px);
-        box-shadow: var(--shadow-md);
+        background: var(--primary-dark);
+        transform: translateY(-1px);
+        box-shadow: var(--shadow-sm);
     }
     
     .btn-transfer {
-        background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+        background: var(--warning);
         color: white;
     }
     
     .btn-transfer:hover {
-        transform: translateY(-2px);
-        box-shadow: var(--shadow-md);
+        background: var(--accent-dark);
+        transform: translateY(-1px);
+        box-shadow: var(--shadow-sm);
     }
     
     .btn-delete {
-        background: linear-gradient(135deg, #ef4444, #dc2626);
-        color: white;
+        background: transparent;
+        border: 1px solid var(--danger);
+        color: var(--danger);
     }
     
     .btn-delete:hover {
-        transform: translateY(-2px);
-        box-shadow: var(--shadow-md);
+        background: var(--danger);
+        color: white;
+        border-color: var(--danger);
     }
     
     .btn-back {
-        background: var(--gray-200);
-        color: var(--text-secondary);
-    }
-    
-    [data-theme='dark'] .btn-back {
-        background: var(--gray-800);
+        background: transparent;
+        border: 1px solid var(--border-light);
         color: var(--text-secondary);
     }
     
     .btn-back:hover {
-        background: var(--gray-300);
-        color: var(--text-primary);
+        border-color: var(--primary);
+        color: var(--primary);
+        background: var(--primary-bg);
     }
     
     /* Адаптивность */
@@ -329,18 +333,27 @@
             align-items: stretch;
         }
         
-        .transfer-select,
-        .transfer-input {
+        .transfer-group {
             width: 100%;
         }
         
         .action-buttons {
-            justify-content: center;
+            justify-content: flex-start;
         }
         
         .history-table th,
         .history-table td {
-            padding: 0.5rem;
+            padding: 0.5rem 0.75rem;
+        }
+    }
+    
+    @media (max-width: 480px) {
+        .action-buttons {
+            flex-direction: column;
+        }
+        
+        .btn-action {
+            justify-content: center;
         }
     }
 </style>
@@ -350,26 +363,26 @@
 <div class="detail-card">
     <div class="detail-header">
         <h1>
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
                 <path d="M4 4h16v16H4z"/>
                 <path d="M8 8h8M8 12h6M8 16h4"/>
             </svg>
-            Письмо №{{ correspondence.incoming_number }}
+            Документ №{{ correspondence.incoming_number }}
         </h1>
-        <p>Детальная информация о входящем документе</p>
+        <p>Полная информация о документе</p>
     </div>
     
     <div class="detail-body">
         <!-- Основная информация -->
         <div class="info-section">
-            <h3>Основная информация</h3>
+            <h3>Основные сведения</h3>
             <div class="info-grid">
                 <div class="info-item">
                     <div class="info-label">Входящий номер</div>
                     <div class="info-value">{{ correspondence.incoming_number }}</div>
                 </div>
                 <div class="info-item">
-                    <div class="info-label">Дата входящего</div>
+                    <div class="info-label">Дата документа</div>
                     <div class="info-value">{{ correspondence.incoming_date.strftime('%d.%m.%Y') }}</div>
                 </div>
                 <div class="info-item">
@@ -387,24 +400,23 @@
                 <div class="info-item">
                     <div class="info-label">Срок исполнения</div>
                     <div class="info-value">
-                        <span class="deadline-value">
-                            {{ correspondence.deadline.strftime('%d.%m.%Y') }}
-                            {% set days_left = (correspondence.deadline - today).days %}
-                            {% if days_left > 0 and correspondence.status.value != 'Исполнено' %}
-                                <span style="color: var(--accent);">(осталось {{ days_left }} дн.)</span>
-                            {% elif days_left <= 0 and correspondence.status.value != 'Исполнено' %}
-                                <span style="color: #dc2626;">(ПРОСРОЧЕНО!)</span>
-                            {% endif %}
-                        </span>
+                        {{ correspondence.deadline.strftime('%d.%m.%Y') }}
+                        {% set days_left = (correspondence.deadline - today).days %}
+                        {% if days_left > 0 and correspondence.status.value != 'Исполнено' %}
+                            <span class="deadline-warning">(осталось {{ days_left }} дн.)</span>
+                        {% elif days_left <= 0 and correspondence.status.value != 'Исполнено' %}
+                            <span class="deadline-expired">(просрочено)</span>
+                        {% endif %}
                     </div>
                 </div>
                 <div class="info-item">
-                    <div class="info-label">Исполнитель</div>
+                    <div class="info-label">Ответственный</div>
                     <div class="info-value">
                         {% if correspondence.executor %}
                             {{ correspondence.executor.full_name }}
+                            <span style="font-size: 0.7rem; color: var(--text-muted);">({{ correspondence.executor.department.value }})</span>
                         {% else %}
-                            <span style="color: var(--text-secondary);">Не назначен</span>
+                            <span style="color: var(--text-muted);">Не назначен</span>
                         {% endif %}
                     </div>
                 </div>
@@ -426,22 +438,22 @@
         
         <!-- Дополнительная информация -->
         <div class="info-section">
-            <h3>Дополнительная информация</h3>
+            <h3>Дополнительные данные</h3>
             <div class="info-grid">
                 <div class="info-item">
-                    <div class="info-label">Отправлено</div>
+                    <div class="info-label">Исходящая информация</div>
                     <div class="info-value">{{ correspondence.sent_info or '—' }}</div>
                 </div>
                 <div class="info-item">
-                    <div class="info-label">Кому</div>
+                    <div class="info-label">Адресат</div>
                     <div class="info-value">{{ correspondence.to_whom or '—' }}</div>
                 </div>
                 <div class="info-item">
-                    <div class="info-label">Контроль</div>
+                    <div class="info-label">Контроль исполнения</div>
                     <div class="info-value">{{ correspondence.control or '—' }}</div>
                 </div>
                 <div class="info-item">
-                    <div class="info-label">Отчет</div>
+                    <div class="info-label">Результат исполнения</div>
                     <div class="info-value">{{ correspondence.report or '—' }}</div>
                 </div>
                 <div class="info-item">
@@ -449,20 +461,20 @@
                     <div class="info-value">{{ correspondence.report_date.strftime('%d.%m.%Y') if correspondence.report_date else '—' }}</div>
                 </div>
                 <div class="info-item">
-                    <div class="info-label">Создатель</div>
+                    <div class="info-label">Автор записи</div>
                     <div class="info-value">{{ correspondence.created_by.full_name if correspondence.created_by else '—' }}</div>
                 </div>
                 <div class="info-item">
-                    <div class="info-label">Дата создания</div>
+                    <div class="info-label">Создано</div>
                     <div class="info-value">{{ correspondence.created_at.strftime('%d.%m.%Y %H:%M') }}</div>
                 </div>
                 <div class="info-item">
-                    <div class="info-label">Последнее обновление</div>
+                    <div class="info-label">Обновлено</div>
                     <div class="info-value">{{ correspondence.updated_at.strftime('%d.%m.%Y %H:%M') }}</div>
                 </div>
                 {% if correspondence.completed_at %}
                 <div class="info-item">
-                    <div class="info-label">Дата выполнения</div>
+                    <div class="info-label">Выполнено</div>
                     <div class="info-value">{{ correspondence.completed_at.strftime('%d.%m.%Y %H:%M') }}</div>
                 </div>
                 {% endif %}
@@ -472,14 +484,14 @@
         <!-- История передач -->
         {% if transfers %}
         <div class="info-section">
-            <h3>📨 История передач</h3>
+            <h3>История передачи</h3>
             <div style="overflow-x: auto;">
                 <table class="history-table">
                     <thead>
                         <tr>
                             <th>Передал</th>
-                            <th>Кому передал</th>
-                            <th>Дата передачи</th>
+                            <th>Получатель</th>
+                            <th>Дата</th>
                             <th>Примечание</th>
                         </tr>
                     </thead>
@@ -498,31 +510,39 @@
         </div>
         {% endif %}
         
-        <!-- Форма передачи письма -->
+        <!-- Форма передачи -->
         <div class="info-section">
-            <h3>📨 Передать письмо</h3>
+            <h3>Передать документ</h3>
             <form action="/api/correspondences/{{ correspondence.id }}/transfer" method="POST" class="transfer-form">
-                <select name="transferred_to_id" required class="transfer-select">
-                    <option value="">Выберите сотрудника</option>
-                    {% for user in available_users %}
-                    <option value="{{ user.id }}">{{ user.full_name }} ({{ user.department.value }})</option>
-                    {% endfor %}
-                </select>
-                <input type="text" name="note" placeholder="Примечание (необязательно)" class="transfer-input">
-                <button type="submit" class="btn-action btn-transfer">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <line x1="22" y1="2" x2="11" y2="13"/>
-                        <polygon points="22 2 15 22 11 13 2 9 22 2"/>
-                    </svg>
-                    Передать письмо
-                </button>
+                <div class="transfer-group">
+                    <label for="transferred_to_id">Сотрудник</label>
+                    <select name="transferred_to_id" id="transferred_to_id" required class="transfer-select">
+                        <option value="">Выберите сотрудника</option>
+                        {% for user in available_users %}
+                        <option value="{{ user.id }}">{{ user.full_name }} — {{ user.department.value }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="transfer-group" style="flex: 2;">
+                    <label for="note">Комментарий</label>
+                    <input type="text" id="note" name="note" placeholder="Основание для передачи..." class="transfer-input">
+                </div>
+                <div class="transfer-group" style="flex: 0 0 auto;">
+                    <button type="submit" class="btn-action btn-transfer">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="22" y1="2" x2="11" y2="13"/>
+                            <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+                        </svg>
+                        Передать
+                    </button>
+                </div>
             </form>
         </div>
         
         <!-- Кнопки действий -->
         <div class="action-buttons">
             <a href="/api/correspondences/{{ correspondence.id }}/edit" class="btn-action btn-edit">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M17 3l4 4-7 7H10v-4l7-7z"/>
                     <path d="M4 20h16"/>
                 </svg>
@@ -531,9 +551,9 @@
             
             {% if current_user.is_admin or correspondence.created_by_id == current_user.id %}
             <form action="/api/correspondences/{{ correspondence.id }}/delete" method="POST" 
-                  onsubmit="return confirm('Вы уверены, что хотите удалить это письмо?')" style="display: inline;">
+                  onsubmit="return confirm('Удалить документ? Это действие необратимо.')" style="display: inline;">
                 <button type="submit" class="btn-action btn-delete">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <polyline points="3 6 5 6 21 6"/>
                         <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
                     </svg>
@@ -543,11 +563,11 @@
             {% endif %}
             
             <a href="/api/correspondences/" class="btn-action btn-back">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <line x1="19" y1="12" x2="5" y2="12"/>
                     <polyline points="12 19 5 12 12 5"/>
                 </svg>
-                Назад к списку
+                Назад
             </a>
         </div>
     </div>

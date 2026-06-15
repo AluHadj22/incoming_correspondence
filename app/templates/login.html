@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Вход в систему | Не твое дело-ВЕБ{% endblock %}
+{% block title %}Авторизация | CorpoFlow{% endblock %}
 
 {% block extra_css %}
 <style>
@@ -10,54 +10,90 @@
         align-items: center;
         justify-content: center;
         padding: 2rem;
+        background: linear-gradient(135deg, var(--bg-main) 0%, var(--bg-main) 100%);
     }
     
     .login-card {
-        max-width: 460px;
+        max-width: 480px;
         width: 100%;
         background: var(--bg-card);
         border-radius: var(--radius-xl);
         box-shadow: var(--shadow-lg);
         overflow: hidden;
-        animation: fadeInUp 0.5s ease-out;
+        transition: var(--transition);
+        border: 1px solid var(--border-light);
+    }
+    
+    .login-card:hover {
+        box-shadow: 0 25px 35px -12px rgba(0, 0, 0, 0.15);
     }
     
     .login-header {
-        background: linear-gradient(135deg, var(--primary), var(--secondary));
-        padding: 2rem;
+        background: var(--primary);
+        padding: 2rem 2rem 1.75rem;
         text-align: center;
         color: white;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .login-header::before {
+        content: '';
+        position: absolute;
+        top: -30%;
+        right: -20%;
+        width: 200px;
+        height: 200px;
+        background: rgba(255, 255, 255, 0.08);
+        border-radius: 50%;
+        pointer-events: none;
+    }
+    
+    .login-header::after {
+        content: '';
+        position: absolute;
+        bottom: -30%;
+        left: -20%;
+        width: 180px;
+        height: 180px;
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 50%;
+        pointer-events: none;
     }
     
     .login-icon {
-        width: 70px;
-        height: 70px;
-        background: rgba(255, 255, 255, 0.2);
-        border-radius: 50%;
+        width: 64px;
+        height: 64px;
+        background: rgba(255, 255, 255, 0.12);
+        border-radius: var(--radius-lg);
         display: flex;
         align-items: center;
         justify-content: center;
-        margin: 0 auto 1rem;
-        backdrop-filter: blur(10px);
-        border: 2px solid rgba(255, 255, 255, 0.3);
+        margin: 0 auto 1.25rem;
+        backdrop-filter: blur(8px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        transition: var(--transition);
     }
     
     .login-icon svg {
-        width: 35px;
-        height: 35px;
+        width: 32px;
+        height: 32px;
         stroke: white;
+        stroke-width: 1.6;
     }
     
     .login-header h2 {
         font-size: 1.5rem;
-        font-weight: 700;
+        font-weight: 600;
         margin-bottom: 0.5rem;
+        letter-spacing: -0.3px;
     }
     
     .login-header p {
         font-size: 0.85rem;
-        opacity: 0.9;
+        opacity: 0.85;
         margin: 0;
+        font-weight: 400;
     }
     
     .login-body {
@@ -70,27 +106,30 @@
     
     .form-group label {
         display: block;
-        font-size: 0.85rem;
-        font-weight: 600;
+        font-size: 0.8rem;
+        font-weight: 500;
         color: var(--text-primary);
         margin-bottom: 0.5rem;
+        letter-spacing: 0.2px;
+        text-transform: uppercase;
     }
     
     .form-control {
         width: 100%;
         padding: 0.75rem 1rem;
         background: var(--bg-main);
-        border: 1.5px solid var(--border);
+        border: 1.5px solid var(--border-light);
         border-radius: var(--radius-md);
         color: var(--text-primary);
         font-size: 0.9rem;
         transition: var(--transition);
+        font-weight: 450;
     }
     
     .form-control:focus {
         outline: none;
         border-color: var(--primary);
-        box-shadow: 0 0 0 3px var(--primary-bg);
+        box-shadow: var(--shadow-focus);
     }
     
     .input-icon {
@@ -104,29 +143,41 @@
         transform: translateY(-50%);
         width: 18px;
         height: 18px;
-        stroke: var(--text-secondary);
+        stroke: var(--text-muted);
         pointer-events: none;
+        transition: stroke 0.2s;
     }
     
     .input-icon .form-control {
-        padding-left: 2.5rem;
+        padding-left: 2.75rem;
+    }
+    
+    .input-icon .form-control:focus + svg {
+        stroke: var(--primary);
     }
     
     .btn-login {
         width: 100%;
         padding: 0.875rem;
-        background: linear-gradient(135deg, var(--primary), var(--secondary));
+        background: var(--primary);
         color: white;
         border: none;
         border-radius: var(--radius-md);
-        font-size: 1rem;
+        font-size: 0.9rem;
         font-weight: 600;
         cursor: pointer;
         transition: var(--transition);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
     }
     
     .btn-login:hover {
-        transform: translateY(-2px);
+        background: var(--primary-dark);
+        transform: translateY(-1px);
         box-shadow: var(--shadow-md);
     }
     
@@ -134,24 +185,31 @@
         transform: translateY(0);
     }
     
+    .btn-login svg {
+        width: 18px;
+        height: 18px;
+        stroke: white;
+        stroke-width: 2;
+    }
+    
     .alert-error {
-        background: linear-gradient(135deg, #fee2e2, #fecaca);
-        color: #991b1b;
+        background: linear-gradient(135deg, rgba(220, 38, 38, 0.08), rgba(220, 38, 38, 0.04));
+        color: var(--danger);
         padding: 0.875rem 1rem;
         border-radius: var(--radius-md);
         font-size: 0.85rem;
         font-weight: 500;
         display: flex;
         align-items: center;
-        gap: 0.5rem;
+        gap: 0.75rem;
         margin-bottom: 1.5rem;
-        border-left: 4px solid #ef4444;
+        border-left: 3px solid var(--danger);
     }
     
     .alert-error svg {
         width: 18px;
         height: 18px;
-        stroke: #991b1b;
+        stroke: var(--danger);
         flex-shrink: 0;
     }
     
@@ -159,7 +217,7 @@
         text-align: center;
         margin-top: 1.5rem;
         padding-top: 1.5rem;
-        border-top: 1px solid var(--border);
+        border-top: 1px solid var(--border-light);
     }
     
     .login-footer a {
@@ -168,6 +226,9 @@
         font-size: 0.85rem;
         font-weight: 500;
         transition: var(--transition);
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
     }
     
     .login-footer a:hover {
@@ -175,28 +236,116 @@
         text-decoration: underline;
     }
     
+    .login-footer svg {
+        width: 14px;
+        height: 14px;
+        stroke: currentColor;
+    }
+    
     .demo-info {
-        margin-top: 1.5rem;
+        margin-top: 1.75rem;
         padding: 1rem;
-        background: var(--gray-100);
+        background: var(--primary-bg);
         border-radius: var(--radius-md);
         font-size: 0.8rem;
+        border: 1px solid var(--border-light);
     }
     
     [data-theme='dark'] .demo-info {
-        background: var(--gray-800);
+        background: rgba(59, 130, 246, 0.08);
     }
     
     .demo-info strong {
         color: var(--primary);
+        font-weight: 600;
     }
     
     .demo-info code {
         background: var(--bg-card);
-        padding: 0.2rem 0.4rem;
+        padding: 0.2rem 0.5rem;
         border-radius: var(--radius-sm);
         font-size: 0.75rem;
-        color: var(--accent);
+        color: var(--primary);
+        font-weight: 500;
+        border: 1px solid var(--border-light);
+    }
+    
+    .demo-header {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-bottom: 0.75rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 1px solid var(--border-light);
+    }
+    
+    .demo-header svg {
+        width: 14px;
+        height: 14px;
+        stroke: var(--primary);
+    }
+    
+    .demo-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 0.75rem;
+        margin-bottom: 0.5rem;
+    }
+    
+    .demo-row:last-child {
+        margin-bottom: 0;
+    }
+    
+    .demo-badge {
+        font-size: 0.7rem;
+        padding: 0.2rem 0.5rem;
+        background: var(--bg-card);
+        border-radius: 20px;
+        color: var(--text-muted);
+        border: 1px solid var(--border-light);
+    }
+    
+    .info-note {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-top: 0.75rem;
+        padding-top: 0.5rem;
+        border-top: 1px solid var(--border-light);
+        font-size: 0.7rem;
+        color: var(--text-muted);
+    }
+    
+    /* Адаптивность */
+    @media (max-width: 520px) {
+        .login-container {
+            padding: 1rem;
+        }
+        
+        .login-body {
+            padding: 1.5rem;
+        }
+        
+        .login-header {
+            padding: 1.5rem;
+        }
+        
+        .login-icon {
+            width: 52px;
+            height: 52px;
+        }
+        
+        .login-icon svg {
+            width: 26px;
+            height: 26px;
+        }
+        
+        .demo-row {
+            flex-direction: column;
+            align-items: flex-start;
+        }
     }
 </style>
 {% endblock %}
@@ -206,12 +355,12 @@
     <div class="login-card">
         <div class="login-header">
             <div class="login-icon">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
-                    <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4M10 17l5-5-5-5M13.5 12H3"/>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+                    <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
                 </svg>
             </div>
-            <h2>Добро пожаловать!</h2>
-            <p>Войдите в систему Не твое дело-ВЕБ</p>
+            <h2>Вход в систему</h2>
+            <p>Введите учетные данные для доступа</p>
         </div>
         
         <div class="login-body">
@@ -228,61 +377,66 @@
             
             <form action="/api/auth/login" method="POST">
                 <div class="form-group">
-                    <label for="username">Имя пользователя</label>
+                    <label for="username">Логин</label>
                     <div class="input-icon">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
                             <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
                             <circle cx="12" cy="7" r="4"/>
                         </svg>
-                        <input type="text" id="username" name="username" class="form-control" placeholder="Введите имя пользователя" required>
+                        <input type="text" id="username" name="username" class="form-control" placeholder="username" required autocomplete="username">
                     </div>
                 </div>
                 
                 <div class="form-group">
                     <label for="password">Пароль</label>
                     <div class="input-icon">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
                             <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
                             <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
                         </svg>
-                        <input type="password" id="password" name="password" class="form-control" placeholder="Введите пароль" required>
+                        <input type="password" id="password" name="password" class="form-control" placeholder="••••••••" required autocomplete="current-password">
                     </div>
                 </div>
                 
                 <button type="submit" class="btn-login">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: inline-block; margin-right: 8px; vertical-align: middle;">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4M10 17l5-5-5-5M13.5 12H3"/>
                     </svg>
-                    Войти в систему
+                    Войти
                 </button>
             </form>
             
             <div class="login-footer">
                 <a href="/api/auth/register">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: inline-block; margin-right: 4px; vertical-align: middle;">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
                         <circle cx="8.5" cy="7" r="4"/>
                         <line x1="20" y1="8" x2="20" y2="14"/>
                         <line x1="23" y1="11" x2="17" y2="11"/>
                     </svg>
-                    Нет аккаунта? Зарегистрироваться
+                    Создать аккаунт
                 </a>
             </div>
             
             <div class="demo-info">
-                <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <div class="demo-header">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <circle cx="12" cy="12" r="10"/>
                         <path d="M12 16v-4M12 8h.01"/>
                     </svg>
-                    <strong>Тестовый доступ</strong>
+                    <strong>Тестовый период</strong>
                 </div>
-                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
-                    <span><code>admin</code> / <code>admin123</code></span>
-                    <span style="font-size: 0.7rem; color: var(--text-secondary);">Администратор</span>
+                <div class="demo-row">
+                    <span><code>Логин админа</code> / <code>Пароль админа</code></span>
+                    <span class="demo-badge">Полный доступ</span>
                 </div>
-                <div style="margin-top: 0.5rem; font-size: 0.7rem; color: var(--text-secondary);">
-                    <i class="info-icon">ℹ️</i> После входа вы попадете на дашборд
+                <div class="info-note">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"/>
+                        <line x1="12" y1="16" x2="12" y2="12"/>
+                        <line x1="12" y1="8" x2="12.01" y2="8"/>
+                    </svg>
+                    <span>После авторизации вы будете перенаправлены на панель управления</span>
                 </div>
             </div>
         </div>

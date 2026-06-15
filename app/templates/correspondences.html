@@ -1,15 +1,38 @@
 {% extends "base.html" %}
 
-{% block title %}Список писем | Система учета корреспонденции{% endblock %}
+{% block title %}Документооборот | CorpoFlow{% endblock %}
 
 {% block extra_css %}
 <style>
+    /* Заголовок секции */
+    .page-header {
+        margin-bottom: 1.75rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+    
+    .page-title {
+        font-size: 1.35rem;
+        font-weight: 600;
+        color: var(--text-primary);
+        letter-spacing: -0.3px;
+        margin-bottom: 0.25rem;
+    }
+    
+    .page-description {
+        color: var(--text-muted);
+        font-size: 0.8rem;
+    }
+    
     /* Панель фильтров */
     .filter-bar {
         background: var(--bg-card);
         border-radius: var(--radius-lg);
-        border: 1px solid var(--border);
-        padding: 1.25rem 1.5rem;
+        border: 1px solid var(--border-light);
+        padding: 1rem 1.25rem;
         margin-bottom: 1.5rem;
     }
     
@@ -27,19 +50,19 @@
     
     .filter-group label {
         display: block;
-        font-size: 0.7rem;
+        font-size: 0.65rem;
         font-weight: 600;
         text-transform: uppercase;
         letter-spacing: 0.5px;
-        color: var(--text-secondary);
-        margin-bottom: 0.5rem;
+        color: var(--text-muted);
+        margin-bottom: 0.4rem;
     }
     
     .filter-select {
         width: 100%;
-        padding: 0.6rem 1rem;
+        padding: 0.55rem 1rem;
         background: var(--bg-main);
-        border: 1px solid var(--border);
+        border: 1px solid var(--border-light);
         border-radius: var(--radius-md);
         color: var(--text-primary);
         font-size: 0.85rem;
@@ -50,7 +73,7 @@
     .filter-select:focus {
         outline: none;
         border-color: var(--primary);
-        box-shadow: 0 0 0 3px var(--primary-bg);
+        box-shadow: var(--shadow-focus);
     }
     
     .filter-actions {
@@ -60,85 +83,92 @@
     
     /* Кнопки */
     .btn-filter {
-        padding: 0.6rem 1.25rem;
+        padding: 0.55rem 1.25rem;
         border-radius: var(--radius-md);
-        font-size: 0.8rem;
+        font-size: 0.75rem;
         font-weight: 600;
         transition: var(--transition);
         cursor: pointer;
         border: none;
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
     }
     
     .btn-filter-primary {
-        background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+        background: var(--primary);
         color: white;
     }
     
     .btn-filter-primary:hover {
-        transform: translateY(-2px);
-        box-shadow: var(--shadow-md);
+        background: var(--primary-dark);
+        transform: translateY(-1px);
+        box-shadow: var(--shadow-sm);
     }
     
     .btn-filter-secondary {
-        background: var(--gray-200);
-        color: var(--text-secondary);
-    }
-    
-    [data-theme='dark'] .btn-filter-secondary {
-        background: var(--gray-800);
+        background: transparent;
+        border: 1px solid var(--border-light);
         color: var(--text-secondary);
     }
     
     .btn-filter-secondary:hover {
-        background: var(--gray-300);
-        color: var(--text-primary);
+        border-color: var(--primary);
+        color: var(--primary);
+        background: var(--primary-bg);
     }
     
     .btn-create {
         display: inline-flex;
         align-items: center;
         gap: 0.5rem;
-        padding: 0.6rem 1.25rem;
-        background: linear-gradient(135deg, #10b981, #059669);
+        padding: 0.55rem 1.25rem;
+        background: var(--primary);
         color: white;
         border: none;
         border-radius: var(--radius-md);
-        font-size: 0.85rem;
-        font-weight: 600;
+        font-size: 0.8rem;
+        font-weight: 500;
         text-decoration: none;
         transition: var(--transition);
     }
     
     .btn-create:hover {
-        transform: translateY(-2px);
-        box-shadow: var(--shadow-md);
+        background: var(--primary-dark);
+        transform: translateY(-1px);
+        box-shadow: var(--shadow-sm);
     }
     
     .btn-export {
         display: inline-flex;
         align-items: center;
         gap: 0.5rem;
-        padding: 0.6rem 1.25rem;
-        background: linear-gradient(135deg, #2563eb, #1d4ed8);
-        color: white;
-        border: none;
+        padding: 0.55rem 1.25rem;
+        background: transparent;
+        border: 1px solid var(--border-light);
+        color: var(--text-secondary);
         border-radius: var(--radius-md);
-        font-size: 0.85rem;
-        font-weight: 600;
+        font-size: 0.8rem;
+        font-weight: 500;
         text-decoration: none;
         transition: var(--transition);
     }
     
     .btn-export:hover {
-        transform: translateY(-2px);
-        box-shadow: var(--shadow-md);
+        border-color: var(--primary);
+        color: var(--primary);
+        background: var(--primary-bg);
+    }
+    
+    .action-buttons {
+        display: flex;
+        gap: 0.75rem;
     }
     
     /* Таблица */
     .table-container {
         background: var(--bg-card);
         border-radius: var(--radius-lg);
-        border: 1px solid var(--border);
+        border: 1px solid var(--border-light);
         overflow: hidden;
     }
     
@@ -147,29 +177,25 @@
     }
     
     .correspondence-table thead tr {
-        background: var(--gray-100);
-    }
-    
-    [data-theme='dark'] .correspondence-table thead tr {
-        background: var(--gray-800);
+        background: var(--primary-bg);
     }
     
     .correspondence-table th {
-        padding: 1rem 1.25rem;
+        padding: 0.875rem 1rem;
         text-align: left;
-        font-size: 0.7rem;
-        font-weight: 700;
+        font-size: 0.65rem;
+        font-weight: 600;
         text-transform: uppercase;
         letter-spacing: 0.5px;
-        color: var(--text-secondary);
-        border-bottom: 1px solid var(--border);
+        color: var(--text-muted);
+        border-bottom: 1px solid var(--border-light);
     }
     
     .correspondence-table td {
-        padding: 1rem 1.25rem;
+        padding: 0.875rem 1rem;
         font-size: 0.85rem;
         color: var(--text-primary);
-        border-bottom: 1px solid var(--border);
+        border-bottom: 1px solid var(--border-light);
         vertical-align: middle;
     }
     
@@ -178,11 +204,7 @@
     }
     
     .correspondence-table tbody tr:hover {
-        background: var(--gray-100);
-    }
-    
-    [data-theme='dark'] .correspondence-table tbody tr:hover {
-        background: var(--gray-800);
+        background: var(--primary-bg);
     }
     
     /* Бейджи статусов */
@@ -190,8 +212,8 @@
         display: inline-flex;
         align-items: center;
         gap: 0.25rem;
-        padding: 0.25rem 0.75rem;
-        border-radius: 50px;
+        padding: 0.2rem 0.65rem;
+        border-radius: 20px;
         font-size: 0.7rem;
         font-weight: 600;
     }
@@ -250,10 +272,10 @@
     .btn-view {
         display: inline-flex;
         align-items: center;
-        gap: 0.25rem;
-        padding: 0.4rem 0.8rem;
+        gap: 0.35rem;
+        padding: 0.35rem 0.8rem;
         background: transparent;
-        border: 1px solid var(--border);
+        border: 1px solid var(--border-light);
         border-radius: var(--radius-sm);
         color: var(--text-secondary);
         font-size: 0.7rem;
@@ -269,51 +291,48 @@
     }
     
     .btn-view svg {
-        width: 14px;
-        height: 14px;
+        width: 12px;
+        height: 12px;
         stroke: currentColor;
     }
     
-    /* Номер письма */
     .letter-number {
-        font-weight: 700;
-        color: var(--text-primary);
+        font-weight: 600;
+        color: var(--primary);
         margin-bottom: 0.2rem;
     }
     
     .letter-date {
         font-size: 0.65rem;
-        color: var(--text-secondary);
+        color: var(--text-muted);
     }
     
-    /* Ссылка на исполнителя */
     .executor-link {
         color: var(--primary);
         text-decoration: none;
         font-weight: 500;
+        font-size: 0.8rem;
     }
     
     .executor-link:hover {
         text-decoration: underline;
     }
     
-    /* Срочный дедлайн */
-    .deadline-urgent {
-        color: var(--accent);
-        font-weight: 600;
+    .deadline-normal {
+        font-size: 0.8rem;
     }
     
     /* Пустое состояние */
     .empty-state {
         text-align: center;
-        padding: 3rem 2rem;
+        padding: 2.5rem 2rem;
     }
     
     .empty-state svg {
-        width: 64px;
-        height: 64px;
-        stroke: var(--text-secondary);
-        opacity: 0.5;
+        width: 56px;
+        height: 56px;
+        stroke: var(--text-muted);
+        opacity: 0.4;
         margin-bottom: 1rem;
     }
     
@@ -325,11 +344,18 @@
     }
     
     .empty-state p {
-        font-size: 0.85rem;
-        color: var(--text-secondary);
+        font-size: 0.8rem;
+        color: var(--text-muted);
+        margin-bottom: 1rem;
     }
     
     /* Адаптивность */
+    @media (max-width: 1024px) {
+        .hide-tablet {
+            display: none;
+        }
+    }
+    
     @media (max-width: 768px) {
         .filter-form {
             flex-direction: column;
@@ -346,48 +372,55 @@
         
         .correspondence-table th,
         .correspondence-table td {
-            padding: 0.75rem 1rem;
-        }
-        
-        .hide-mobile {
-            display: none;
+            padding: 0.625rem 0.875rem;
         }
         
         .action-buttons {
-            flex-direction: column;
             width: 100%;
         }
         
         .btn-create, .btn-export {
+            flex: 1;
             justify-content: center;
+        }
+        
+        .page-header {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+    }
+    
+    @media (max-width: 640px) {
+        .hide-mobile {
+            display: none;
+        }
+        
+        .correspondence-table td {
+            font-size: 0.75rem;
         }
     }
 </style>
 {% endblock %}
 
 {% block content %}
-<div style="margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+<div class="page-header">
     <div>
-        <h1 style="font-size: 1.5rem; font-weight: 800; color: var(--text-primary); margin-bottom: 0.25rem;">
-            📋 Входящая корреспонденция
-        </h1>
-        <p style="color: var(--text-secondary); font-size: 0.85rem;">
-            Управление и отслеживание входящих писем
-        </p>
+        <h1 class="page-title">Реестр документов</h1>
+        <p class="page-description">Управление входящей корреспонденцией</p>
     </div>
-    <div class="action-buttons" style="display: flex; gap: 0.75rem;">
+    <div class="action-buttons">
         <a href="/api/correspondences/export{% if status_filter %}?status_filter={{ status_filter }}{% endif %}" class="btn-export">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M12 3v12m0 0-3-3m3 3 3-3M5 17v2a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-2"/>
             </svg>
-            Экспорт в Excel
+            Экспорт
         </a>
         <a href="/api/correspondences/create" class="btn-create">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <line x1="12" y1="5" x2="12" y2="19"/>
                 <line x1="5" y1="12" x2="19" y2="12"/>
             </svg>
-            Создать письмо
+            Создать
         </a>
     </div>
 </div>
@@ -396,7 +429,7 @@
 <div class="filter-bar">
     <form method="GET" action="/api/correspondences/" class="filter-form">
         <div class="filter-group">
-            <label for="status_filter">Фильтр по статусу</label>
+            <label for="status_filter">Статус</label>
             <select id="status_filter" name="status_filter" class="filter-select">
                 <option value="">Все статусы</option>
                 {% for status in statuses %}
@@ -406,14 +439,14 @@
         </div>
         <div class="filter-actions">
             <button type="submit" class="btn-filter btn-filter-primary">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: inline-block; margin-right: 0.25rem;">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: inline-block; margin-right: 0.25rem;">
                     <polygon points="22 3 2 3 10 13 10 21 14 18 14 13 22 3"/>
                 </svg>
                 Применить
             </button>
             {% if status_filter %}
             <a href="/api/correspondences/" class="btn-filter btn-filter-secondary" style="text-decoration: none;">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: inline-block; margin-right: 0.25rem;">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: inline-block; margin-right: 0.25rem;">
                     <line x1="18" y1="6" x2="6" y2="18"/>
                     <line x1="6" y1="6" x2="18" y2="18"/>
                 </svg>
@@ -424,54 +457,54 @@
     </form>
 </div>
 
-<!-- Таблица писем -->
+<!-- Таблица документов -->
 <div class="table-container">
     {% if correspondences %}
     <div style="overflow-x: auto;">
         <table class="correspondence-table">
             <thead>
                 <tr>
-                    <th>№</th>
-                    <th>Входящий номер</th>
-                    <th class="hide-mobile">Поступило</th>
+                    <th style="width: 45px;">#</th>
+                    <th>Вх. номер</th>
+                    <th class="hide-tablet">Поступление</th>
                     <th>Отправитель</th>
-                    <th class="hide-mobile">Содержание</th>
+                    <th class="hide-tablet hide-mobile">Содержание</th>
                     <th>Исполнитель</th>
                     <th>Срок</th>
                     <th>Статус</th>
-                    <th>Действия</th>
+                    <th style="width: 85px;"></th>
                 </tr>
             </thead>
             <tbody>
                 {% for corr in correspondences %}
                 <tr>
-                    <td style="font-weight: 600; color: var(--primary); width: 50px;">
+                    <td style="font-weight: 500; color: var(--text-muted);">
                         {{ loop.index }}
                     </td>
                     <td>
                         <div class="letter-number">{{ corr.incoming_number }}</div>
                         <div class="letter-date">{{ corr.incoming_date.strftime('%d.%m.%Y') }}</div>
                     </td>
-                    <td class="hide-mobile">{{ corr.received_date.strftime('%d.%m.%Y') }}</td>
+                    <td class="hide-tablet">{{ corr.received_date.strftime('%d.%m.%Y') }}</td>
                     <td>
-                        <div style="font-weight: 500; max-width: 180px; white-space: normal; word-break: break-word;">
-                            {{ corr.sender[:40] }}{% if corr.sender|length > 40 %}...{% endif %}
+                        <div style="font-weight: 500; max-width: 180px; white-space: normal; word-break: break-word; line-height: 1.4;">
+                            {{ corr.sender[:35] }}{% if corr.sender|length > 35 %}…{% endif %}
                         </div>
                     </td>
-                    <td class="hide-mobile">
-                        <div style="max-width: 200px; white-space: normal; word-break: break-word; color: var(--text-secondary);">
-                            {{ corr.content[:60] }}{% if corr.content|length > 60 %}...{% endif %}
+                    <td class="hide-tablet hide-mobile">
+                        <div style="max-width: 200px; white-space: normal; word-break: break-word; color: var(--text-secondary); font-size: 0.8rem; line-height: 1.4;">
+                            {{ corr.content[:45] }}{% if corr.content|length > 45 %}…{% endif %}
                         </div>
                     </td>
                     <td>
                         {% if corr.executor %}
-                        <span class="executor-link">{{ corr.executor.full_name }}</span>
+                        <a href="#" class="executor-link">{{ corr.executor.full_name.split()[0] }}</a>
                         {% else %}
-                        <span style="color: var(--text-secondary); font-size: 0.75rem;">Не назначен</span>
+                        <span style="color: var(--text-muted); font-size: 0.7rem;">—</span>
                         {% endif %}
                     </td>
                     <td>
-                        <span>{{ corr.deadline.strftime('%d.%m.%Y') }}</span>
+                        <span class="deadline-normal">{{ corr.deadline.strftime('%d.%m.%Y') }}</span>
                     </td>
                     <td>
                         <span class="status-badge 
@@ -489,7 +522,7 @@
                                 <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
                                 <circle cx="12" cy="12" r="3"/>
                             </svg>
-                            Просмотр
+                            Открыть
                         </a>
                     </td>
                 </tr>
@@ -499,18 +532,18 @@
     </div>
     {% else %}
     <div class="empty-state">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
             <path d="M4 4h16v16H4z"/>
             <path d="M8 8h8M8 12h6M8 16h4"/>
         </svg>
-        <h4>Нет писем</h4>
-        <p>В данный список писем пуст. Создайте первое письмо или его создадут за тебя</p>
-        <a href="/api/correspondences/create" class="btn-create" style="margin-top: 1rem; display: inline-flex;">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <h4>Нет документов</h4>
+        <p>Список корреспонденции пуст</p>
+        <a href="/api/correspondences/create" class="btn-create" style="display: inline-flex;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <line x1="12" y1="5" x2="12" y2="19"/>
                 <line x1="5" y1="12" x2="19" y2="12"/>
             </svg>
-            Создать письмо
+            Создать документ
         </a>
     </div>
     {% endif %}
@@ -520,16 +553,16 @@
 {% block extra_js %}
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // Анимация появления строк таблицы
+        // Плавное появление строк таблицы
         const rows = document.querySelectorAll('.correspondence-table tbody tr');
         rows.forEach((row, index) => {
             row.style.opacity = '0';
-            row.style.transform = 'translateX(-10px)';
+            row.style.transform = 'translateX(-8px)';
             setTimeout(() => {
-                row.style.transition = 'all 0.3s ease-out';
+                row.style.transition = 'all 0.25s ease-out';
                 row.style.opacity = '1';
                 row.style.transform = 'translateX(0)';
-            }, index * 50);
+            }, index * 40);
         });
     });
 </script>

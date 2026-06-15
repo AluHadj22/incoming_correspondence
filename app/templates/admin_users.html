@@ -1,22 +1,22 @@
 {% extends "base.html" %}
 
-{% block title %}Управление пользователями | Админ-панель{% endblock %}
+{% block title %}Управление персоналом | CorpoFlow Admin{% endblock %}
 
 {% block extra_css %}
 <style>
-    /* Заголовок страницы */
     .page-header {
-        margin-bottom: 1.5rem;
+        margin-bottom: 1.75rem;
     }
     
     .page-header h1 {
-        font-size: 1.5rem;
-        font-weight: 800;
+        font-size: 1.35rem;
+        font-weight: 600;
         color: var(--text-primary);
         margin-bottom: 0.25rem;
         display: flex;
         align-items: center;
         gap: 0.5rem;
+        letter-spacing: -0.3px;
     }
     
     .page-header h1 svg {
@@ -26,16 +26,15 @@
     }
     
     .page-header p {
-        color: var(--text-secondary);
-        font-size: 0.85rem;
+        color: var(--text-muted);
+        font-size: 0.8rem;
     }
     
-    /* Панель фильтров */
     .filter-bar {
         background: var(--bg-card);
         border-radius: var(--radius-lg);
-        border: 1px solid var(--border);
-        padding: 1.25rem 1.5rem;
+        border: 1px solid var(--border-light);
+        padding: 1rem 1.25rem;
         margin-bottom: 1.5rem;
     }
     
@@ -53,19 +52,19 @@
     
     .filter-group label {
         display: block;
-        font-size: 0.7rem;
+        font-size: 0.65rem;
         font-weight: 600;
         text-transform: uppercase;
         letter-spacing: 0.5px;
-        color: var(--text-secondary);
-        margin-bottom: 0.5rem;
+        color: var(--text-muted);
+        margin-bottom: 0.4rem;
     }
     
     .filter-select {
         width: 100%;
-        padding: 0.6rem 1rem;
+        padding: 0.55rem 1rem;
         background: var(--bg-main);
-        border: 1px solid var(--border);
+        border: 1px solid var(--border-light);
         border-radius: var(--radius-md);
         color: var(--text-primary);
         font-size: 0.85rem;
@@ -76,7 +75,7 @@
     .filter-select:focus {
         outline: none;
         border-color: var(--primary);
-        box-shadow: 0 0 0 3px var(--primary-bg);
+        box-shadow: var(--shadow-focus);
     }
     
     .filter-actions {
@@ -84,51 +83,49 @@
         gap: 0.5rem;
     }
     
-    /* Кнопки фильтров */
     .btn-filter {
-        padding: 0.6rem 1.25rem;
+        padding: 0.55rem 1.25rem;
         border-radius: var(--radius-md);
-        font-size: 0.8rem;
+        font-size: 0.75rem;
         font-weight: 600;
         transition: var(--transition);
         cursor: pointer;
         border: none;
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
     }
     
     .btn-filter-primary {
-        background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+        background: var(--primary);
         color: white;
     }
     
     .btn-filter-primary:hover {
-        transform: translateY(-2px);
-        box-shadow: var(--shadow-md);
+        background: var(--primary-dark);
+        transform: translateY(-1px);
+        box-shadow: var(--shadow-sm);
     }
     
     .btn-filter-secondary {
-        background: var(--gray-200);
+        background: transparent;
+        border: 1px solid var(--border-light);
         color: var(--text-secondary);
         text-decoration: none;
         display: inline-flex;
         align-items: center;
-        gap: 0.25rem;
-    }
-    
-    [data-theme='dark'] .btn-filter-secondary {
-        background: var(--gray-800);
-        color: var(--text-secondary);
+        gap: 0.35rem;
     }
     
     .btn-filter-secondary:hover {
-        background: var(--gray-300);
-        color: var(--text-primary);
+        border-color: var(--primary);
+        color: var(--primary);
+        background: var(--primary-bg);
     }
     
-    /* Таблица */
     .table-container {
         background: var(--bg-card);
         border-radius: var(--radius-lg);
-        border: 1px solid var(--border);
+        border: 1px solid var(--border-light);
         overflow: hidden;
         margin-bottom: 1.5rem;
     }
@@ -138,29 +135,25 @@
     }
     
     .users-table thead tr {
-        background: var(--gray-100);
-    }
-    
-    [data-theme='dark'] .users-table thead tr {
-        background: var(--gray-800);
+        background: var(--primary-bg);
     }
     
     .users-table th {
-        padding: 1rem 1.25rem;
+        padding: 0.875rem 1rem;
         text-align: left;
-        font-size: 0.7rem;
-        font-weight: 700;
+        font-size: 0.65rem;
+        font-weight: 600;
         text-transform: uppercase;
         letter-spacing: 0.5px;
-        color: var(--text-secondary);
-        border-bottom: 1px solid var(--border);
+        color: var(--text-muted);
+        border-bottom: 1px solid var(--border-light);
     }
     
     .users-table td {
-        padding: 1rem 1.25rem;
+        padding: 0.875rem 1rem;
         font-size: 0.85rem;
         color: var(--text-primary);
-        border-bottom: 1px solid var(--border);
+        border-bottom: 1px solid var(--border-light);
         vertical-align: middle;
     }
     
@@ -169,20 +162,15 @@
     }
     
     .users-table tbody tr:hover {
-        background: var(--gray-100);
+        background: var(--primary-bg);
     }
     
-    [data-theme='dark'] .users-table tbody tr:hover {
-        background: var(--gray-800);
-    }
-    
-    /* Бейджи статусов */
     .badge-active {
         display: inline-flex;
         align-items: center;
-        gap: 0.25rem;
-        padding: 0.25rem 0.75rem;
-        border-radius: 50px;
+        gap: 0.3rem;
+        padding: 0.2rem 0.65rem;
+        border-radius: 20px;
         font-size: 0.7rem;
         font-weight: 600;
         background: #d1fae5;
@@ -192,9 +180,9 @@
     .badge-blocked {
         display: inline-flex;
         align-items: center;
-        gap: 0.25rem;
-        padding: 0.25rem 0.75rem;
-        border-radius: 50px;
+        gap: 0.3rem;
+        padding: 0.2rem 0.65rem;
+        border-radius: 20px;
         font-size: 0.7rem;
         font-weight: 600;
         background: #fee2e2;
@@ -204,39 +192,38 @@
     .badge-admin {
         display: inline-flex;
         align-items: center;
-        gap: 0.25rem;
-        padding: 0.25rem 0.75rem;
-        border-radius: 50px;
+        gap: 0.3rem;
+        padding: 0.2rem 0.65rem;
+        border-radius: 20px;
         font-size: 0.7rem;
         font-weight: 600;
-        background: linear-gradient(135deg, #667eea20, #764ba220);
+        background: var(--primary-bg);
         color: var(--primary);
     }
     
     .badge-user {
         display: inline-flex;
         align-items: center;
-        gap: 0.25rem;
-        padding: 0.25rem 0.75rem;
-        border-radius: 50px;
+        gap: 0.3rem;
+        padding: 0.2rem 0.65rem;
+        border-radius: 20px;
         font-size: 0.7rem;
         font-weight: 600;
-        background: var(--gray-200);
-        color: var(--text-secondary);
+        background: var(--border-light);
+        color: var(--text-muted);
     }
     
     [data-theme='dark'] .badge-user {
         background: var(--gray-800);
     }
     
-    /* Кнопка просмотра */
     .btn-view {
         display: inline-flex;
         align-items: center;
-        gap: 0.25rem;
-        padding: 0.4rem 0.8rem;
+        gap: 0.35rem;
+        padding: 0.35rem 0.8rem;
         background: transparent;
-        border: 1px solid var(--border);
+        border: 1px solid var(--border-light);
         border-radius: var(--radius-sm);
         color: var(--text-secondary);
         font-size: 0.7rem;
@@ -251,29 +238,28 @@
         background: var(--primary-bg);
     }
     
-    /* Кнопка создания */
     .btn-create-user {
         display: inline-flex;
         align-items: center;
         gap: 0.5rem;
-        padding: 0.7rem 1.25rem;
-        background: linear-gradient(135deg, #10b981, #059669);
+        padding: 0.6rem 1.25rem;
+        background: var(--primary);
         color: white;
         border: none;
         border-radius: var(--radius-md);
-        font-size: 0.85rem;
-        font-weight: 600;
+        font-size: 0.8rem;
+        font-weight: 500;
         text-decoration: none;
         transition: var(--transition);
         cursor: pointer;
     }
     
     .btn-create-user:hover {
-        transform: translateY(-2px);
-        box-shadow: var(--shadow-md);
+        background: var(--primary-dark);
+        transform: translateY(-1px);
+        box-shadow: var(--shadow-sm);
     }
     
-    /* Модальное окно */
     .modal-overlay {
         display: none;
         position: fixed;
@@ -281,7 +267,7 @@
         left: 0;
         width: 100%;
         height: 100%;
-        background: rgba(0, 0, 0, 0.6);
+        background: rgba(0, 0, 0, 0.5);
         backdrop-filter: blur(4px);
         z-index: 1000;
         align-items: center;
@@ -295,23 +281,23 @@
     .modal-content {
         background: var(--bg-card);
         border-radius: var(--radius-xl);
-        max-width: 500px;
+        max-width: 520px;
         width: 90%;
-        max-height: 90vh;
+        max-height: 85vh;
         overflow-y: auto;
-        box-shadow: var(--shadow-xl);
-        animation: fadeInUp 0.3s ease-out;
+        box-shadow: var(--shadow-lg);
+        border: 1px solid var(--border-light);
     }
     
     .modal-header {
-        padding: 1.25rem 1.5rem;
-        border-bottom: 1px solid var(--border);
-        background: linear-gradient(135deg, var(--primary-bg), transparent);
+        padding: 1rem 1.25rem;
+        border-bottom: 1px solid var(--border-light);
+        background: var(--primary-bg);
     }
     
     .modal-header h3 {
-        font-size: 1.1rem;
-        font-weight: 700;
+        font-size: 1rem;
+        font-weight: 600;
         color: var(--text-primary);
         display: flex;
         align-items: center;
@@ -319,28 +305,76 @@
     }
     
     .modal-body {
-        padding: 1.5rem;
+        padding: 1.25rem;
+    }
+    
+    .form-group {
+        margin-bottom: 1rem;
+    }
+    
+    .form-group label {
+        display: block;
+        font-size: 0.7rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+        color: var(--text-muted);
+        margin-bottom: 0.35rem;
+    }
+    
+    .form-control {
+        width: 100%;
+        padding: 0.55rem 0.85rem;
+        background: var(--bg-main);
+        border: 1.5px solid var(--border-light);
+        border-radius: var(--radius-md);
+        color: var(--text-primary);
+        font-size: 0.85rem;
+        transition: var(--transition);
+    }
+    
+    .form-control:focus {
+        outline: none;
+        border-color: var(--primary);
+        box-shadow: var(--shadow-focus);
+    }
+    
+    .form-checkbox {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-top: 0.5rem;
+    }
+    
+    .form-checkbox input {
+        width: 16px;
+        height: 16px;
+        cursor: pointer;
+    }
+    
+    .form-checkbox label {
+        margin: 0;
+        cursor: pointer;
     }
     
     .modal-actions {
         display: flex;
-        gap: 1rem;
-        margin-top: 1.5rem;
+        gap: 0.75rem;
+        margin-top: 1.25rem;
         padding-top: 1rem;
-        border-top: 1px solid var(--border);
+        border-top: 1px solid var(--border-light);
     }
     
-    /* Пустое состояние */
     .empty-state {
         text-align: center;
-        padding: 3rem 2rem;
+        padding: 2.5rem 2rem;
     }
     
     .empty-state svg {
-        width: 64px;
-        height: 64px;
-        stroke: var(--text-secondary);
-        opacity: 0.5;
+        width: 56px;
+        height: 56px;
+        stroke: var(--text-muted);
+        opacity: 0.4;
         margin-bottom: 1rem;
     }
     
@@ -352,11 +386,10 @@
     }
     
     .empty-state p {
-        font-size: 0.85rem;
-        color: var(--text-secondary);
+        font-size: 0.8rem;
+        color: var(--text-muted);
     }
     
-    /* Адаптивность */
     @media (max-width: 768px) {
         .filter-form {
             flex-direction: column;
@@ -373,7 +406,7 @@
         
         .users-table th,
         .users-table td {
-            padding: 0.75rem 1rem;
+            padding: 0.625rem 0.875rem;
         }
         
         .hide-mobile {
@@ -386,20 +419,19 @@
 {% block content %}
 <div class="page-header">
     <h1>
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
             <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
             <circle cx="12" cy="7" r="4"/>
         </svg>
-        Управление пользователями
+        Кадровый учет
     </h1>
-    <p>Просмотр, блокировка и управление учетными записями</p>
+    <p>Управление учетными записями сотрудников</p>
 </div>
 
-<!-- Панель фильтров -->
 <div class="filter-bar">
     <form method="GET" action="/admin/users" class="filter-form">
         <div class="filter-group">
-            <label for="department">Фильтр по отделу</label>
+            <label for="department">Отдел</label>
             <select id="department" name="department" class="filter-select">
                 <option value="">Все отделы</option>
                 {% for dept in departments %}
@@ -409,7 +441,7 @@
         </div>
         
         <div class="filter-group">
-            <label for="is_active">Фильтр по статусу</label>
+            <label for="is_active">Статус</label>
             <select id="is_active" name="is_active" class="filter-select">
                 <option value="">Все статусы</option>
                 <option value="active" {% if selected_status == 'active' %}selected{% endif %}>Активные</option>
@@ -419,14 +451,14 @@
         
         <div class="filter-actions">
             <button type="submit" class="btn-filter btn-filter-primary">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: inline-block; margin-right: 0.25rem;">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: inline-block; margin-right: 0.25rem;">
                     <polygon points="22 3 2 3 10 13 10 21 14 18 14 13 22 3"/>
                 </svg>
                 Применить
             </button>
             {% if selected_department or selected_status %}
             <a href="/admin/users" class="btn-filter btn-filter-secondary">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: inline-block; margin-right: 0.25rem;">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: inline-block; margin-right: 0.25rem;">
                     <line x1="18" y1="6" x2="6" y2="18"/>
                     <line x1="6" y1="6" x2="18" y2="18"/>
                 </svg>
@@ -437,7 +469,6 @@
     </form>
 </div>
 
-<!-- Таблица пользователей -->
 <div class="table-container">
     {% if users %}
     <div style="overflow-x: auto;">
@@ -445,24 +476,24 @@
             <thead>
                 <tr>
                     <th>ID</th>
-                    <th>Имя пользователя</th>
+                    <th>Логин</th>
                     <th>ФИО</th>
                     <th class="hide-mobile">Email</th>
                     <th>Отдел</th>
                     <th class="hide-mobile">Телефон</th>
                     <th>Статус</th>
                     <th>Роль</th>
-                    <th class="hide-mobile">Дата регистрации</th>
-                    <th>Действия</th>
+                    <th class="hide-mobile">Регистрация</th>
+                    <th></th>
                 </tr>
             </thead>
             <tbody>
                 {% for user in users %}
                 <tr>
                     <td style="font-weight: 600; color: var(--primary);">{{ user.id }}</td>
-                    <td>{{ user.username }}</td>
-                    <td>{{ user.full_name }}</td>
-                    <td class="hide-mobile">{{ user.email }}</td>
+                    <td><span style="font-family: monospace;">{{ user.username }}</span></td>
+                    <td>{{ user.full_name[:35] }}{% if user.full_name|length > 35 %}…{% endif %}</td>
+                    <td class="hide-mobile">{{ user.email[:30] }}{% if user.email|length > 30 %}…{% endif %}</td>
                     <td>{{ user.department.value }}</td>
                     <td class="hide-mobile">{{ user.phone_number or '—' }}</td>
                     <td>
@@ -486,11 +517,11 @@
                     <td>
                         {% if user.is_admin %}
                         <span class="badge-admin">
-                            👑 Админ
+                            👑 Администратор
                         </span>
                         {% else %}
                         <span class="badge-user">
-                            👤 Пользователь
+                            👤 Сотрудник
                         </span>
                         {% endif %}
                     </td>
@@ -501,7 +532,7 @@
                                 <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
                                 <circle cx="12" cy="12" r="3"/>
                             </svg>
-                            Детали
+                            Карточка
                         </a>
                     </td>
                 </tr>
@@ -511,60 +542,58 @@
     </div>
     {% else %}
     <div class="empty-state">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
             <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
             <circle cx="12" cy="7" r="4"/>
         </svg>
-        <h4>Пользователи не найдены</h4>
-        <p>Попробуйте изменить параметры фильтрации</p>
+        <h4>Сотрудники не найдены</h4>
+        <p>Измените параметры фильтрации или создайте нового пользователя</p>
     </div>
     {% endif %}
 </div>
 
-<!-- Кнопка создания пользователя -->
 <div style="margin-top: 0.5rem;">
     <button onclick="showCreateForm()" class="btn-create-user">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <line x1="12" y1="5" x2="12" y2="19"/>
             <line x1="5" y1="12" x2="19" y2="12"/>
         </svg>
-        Создать пользователя
+        Добавить сотрудника
     </button>
 </div>
 
-<!-- Модальное окно создания пользователя -->
 <div id="createUserModal" class="modal-overlay">
     <div class="modal-content">
         <div class="modal-header">
             <h3>
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <line x1="12" y1="5" x2="12" y2="19"/>
                     <line x1="5" y1="12" x2="19" y2="12"/>
                 </svg>
-                Создание пользователя
+                Новый сотрудник
             </h3>
         </div>
         <div class="modal-body">
             <form action="/admin/users/create" method="POST" id="createUserForm">
                 <div class="form-group">
-                    <label>Email *</label>
-                    <input type="email" name="email" class="form-control" required>
+                    <label for="email_modal">Email</label>
+                    <input type="email" id="email_modal" name="email" class="form-control" required>
                 </div>
                 <div class="form-group">
-                    <label>Имя пользователя *</label>
-                    <input type="text" name="username" class="form-control" required>
+                    <label for="username_modal">Логин</label>
+                    <input type="text" id="username_modal" name="username" class="form-control" required>
                 </div>
                 <div class="form-group">
-                    <label>ФИО *</label>
-                    <input type="text" name="full_name" class="form-control" required>
+                    <label for="full_name_modal">Полное имя</label>
+                    <input type="text" id="full_name_modal" name="full_name" class="form-control" required>
                 </div>
                 <div class="form-group">
-                    <label>Пароль *</label>
-                    <input type="password" name="password" class="form-control" required>
+                    <label for="password_modal">Пароль</label>
+                    <input type="password" id="password_modal" name="password" class="form-control" required>
                 </div>
                 <div class="form-group">
-                    <label>Отдел *</label>
-                    <select name="department" class="form-control" required>
+                    <label for="department_modal">Отдел</label>
+                    <select id="department_modal" name="department" class="form-control" required>
                         <option value="">Выберите отдел</option>
                         {% for dept in departments %}
                         <option value="{{ dept }}">{{ dept }}</option>
@@ -572,13 +601,12 @@
                     </select>
                 </div>
                 <div class="form-group">
-                    <label>Телефон</label>
-                    <input type="tel" name="phone_number" class="form-control" placeholder="+7XXXXXXXXXX">
+                    <label for="phone_modal">Телефон</label>
+                    <input type="tel" id="phone_modal" name="phone_number" class="form-control" placeholder="+7 (XXX) XXX-XX-XX">
                 </div>
-                <div class="form-group">
-                    <label>
-                        <input type="checkbox" name="is_admin" value="true"> Администратор
-                    </label>
+                <div class="form-checkbox">
+                    <input type="checkbox" id="is_admin_modal" name="is_admin" value="true">
+                    <label for="is_admin_modal">Назначить администратором</label>
                 </div>
                 <div class="modal-actions">
                     <button type="submit" class="btn-filter btn-filter-primary">Создать</button>
@@ -598,7 +626,6 @@ function hideCreateForm() {
     document.getElementById('createUserModal').classList.remove('show');
 }
 
-// Закрытие модального окна при клике вне его
 document.getElementById('createUserModal').addEventListener('click', function(e) {
     if (e.target === this) {
         hideCreateForm();

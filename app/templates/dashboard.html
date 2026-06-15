@@ -1,23 +1,43 @@
 {% extends "base.html" %}
 
-{% block title %}Дашборд | Система учета корреспонденции{% endblock %}
+{% block title %}Панель управления | CorpoFlow{% endblock %}
 
 {% block extra_css %}
 <style>
+    /* Приветственная секция */
+    .welcome-section {
+        margin-bottom: 2rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 2px solid var(--border-light);
+    }
+    
+    .welcome-title {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: var(--text-primary);
+        margin-bottom: 0.25rem;
+        letter-spacing: -0.3px;
+    }
+    
+    .welcome-subtitle {
+        color: var(--text-muted);
+        font-size: 0.85rem;
+    }
+    
     /* Статистические карточки */
     .stats-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-        gap: 1.5rem;
+        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+        gap: 1.25rem;
         margin-bottom: 2rem;
     }
     
     .stat-card {
         background: var(--bg-card);
         border-radius: var(--radius-lg);
-        padding: 1.5rem;
+        padding: 1.25rem;
         transition: var(--transition);
-        border: 1px solid var(--border);
+        border: 1px solid var(--border-light);
         position: relative;
         overflow: hidden;
     }
@@ -29,12 +49,13 @@
         left: 0;
         right: 0;
         height: 3px;
-        background: linear-gradient(90deg, var(--primary), var(--secondary));
+        background: var(--primary);
     }
     
     .stat-card:hover {
-        transform: translateY(-4px);
-        box-shadow: var(--shadow-lg);
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-md);
+        border-color: var(--primary-light);
     }
     
     .stat-header {
@@ -45,8 +66,8 @@
     }
     
     .stat-icon {
-        width: 48px;
-        height: 48px;
+        width: 44px;
+        height: 44px;
         border-radius: var(--radius-md);
         display: flex;
         align-items: center;
@@ -55,23 +76,23 @@
     }
     
     .stat-icon svg {
-        width: 24px;
-        height: 24px;
+        width: 22px;
+        height: 22px;
         stroke: var(--primary);
     }
     
     .stat-value {
-        font-size: 2rem;
-        font-weight: 800;
+        font-size: 1.75rem;
+        font-weight: 700;
         color: var(--text-primary);
         line-height: 1.2;
         margin-bottom: 0.25rem;
     }
     
     .stat-label {
-        font-size: 0.8rem;
+        font-size: 0.7rem;
         font-weight: 500;
-        color: var(--text-secondary);
+        color: var(--text-muted);
         text-transform: uppercase;
         letter-spacing: 0.5px;
     }
@@ -79,41 +100,59 @@
     .stat-trend {
         font-size: 0.7rem;
         margin-top: 0.5rem;
-        color: var(--text-secondary);
+        color: var(--text-muted);
+        padding-top: 0.5rem;
+        border-top: 1px solid var(--border-light);
+    }
+    
+    .stat-trend-warning {
+        color: var(--warning);
     }
     
     /* Карточка секции */
     .section-card {
         background: var(--bg-card);
         border-radius: var(--radius-lg);
-        border: 1px solid var(--border);
+        border: 1px solid var(--border-light);
         overflow: hidden;
-        margin-bottom: 2rem;
+        margin-bottom: 1.75rem;
     }
     
     .section-header {
-        padding: 1.25rem 1.5rem;
-        border-bottom: 1px solid var(--border);
+        padding: 1rem 1.25rem;
+        border-bottom: 1px solid var(--border-light);
         display: flex;
         justify-content: space-between;
         align-items: center;
         flex-wrap: wrap;
         gap: 1rem;
+        background: var(--primary-bg);
     }
     
     .section-title {
-        font-size: 1.1rem;
-        font-weight: 700;
+        font-size: 0.9rem;
+        font-weight: 600;
         color: var(--text-primary);
         display: flex;
         align-items: center;
         gap: 0.5rem;
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
     }
     
     .section-title svg {
-        width: 20px;
-        height: 20px;
+        width: 18px;
+        height: 18px;
         stroke: var(--primary);
+    }
+    
+    .badge-count {
+        background: var(--primary);
+        color: white;
+        padding: 0.2rem 0.6rem;
+        border-radius: 20px;
+        font-size: 0.7rem;
+        font-weight: 600;
     }
     
     /* Таблицы */
@@ -122,25 +161,25 @@
     }
     
     .data-table thead tr {
-        background: var(--gray-100);
+        background: var(--bg-main);
     }
     
     .data-table th {
-        padding: 1rem 1.5rem;
+        padding: 0.875rem 1.25rem;
         text-align: left;
-        font-size: 0.75rem;
-        font-weight: 700;
+        font-size: 0.7rem;
+        font-weight: 600;
         text-transform: uppercase;
         letter-spacing: 0.5px;
-        color: var(--text-secondary);
-        border-bottom: 1px solid var(--border);
+        color: var(--text-muted);
+        border-bottom: 1px solid var(--border-light);
     }
     
     .data-table td {
-        padding: 1rem 1.5rem;
+        padding: 0.875rem 1.25rem;
         font-size: 0.85rem;
         color: var(--text-primary);
-        border-bottom: 1px solid var(--border);
+        border-bottom: 1px solid var(--border-light);
         vertical-align: middle;
     }
     
@@ -149,7 +188,7 @@
     }
     
     .data-table tbody tr:hover {
-        background: var(--gray-100);
+        background: var(--primary-bg);
     }
     
     /* Бейджи статусов */
@@ -157,8 +196,8 @@
         display: inline-flex;
         align-items: center;
         gap: 0.25rem;
-        padding: 0.25rem 0.75rem;
-        border-radius: 50px;
+        padding: 0.25rem 0.7rem;
+        border-radius: 20px;
         font-size: 0.7rem;
         font-weight: 600;
     }
@@ -205,14 +244,20 @@
     
     /* Кнопки */
     .btn-sm {
-        padding: 0.4rem 0.8rem;
-        font-size: 0.75rem;
+        padding: 0.35rem 0.8rem;
+        font-size: 0.7rem;
         border-radius: var(--radius-sm);
+        font-weight: 500;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+        transition: var(--transition);
     }
     
     .btn-outline {
         background: transparent;
-        border: 1px solid var(--border);
+        border: 1px solid var(--border-light);
         color: var(--text-secondary);
     }
     
@@ -222,42 +267,61 @@
         background: var(--primary-bg);
     }
     
+    .btn-primary-sm {
+        background: var(--primary);
+        color: white;
+        border: none;
+    }
+    
+    .btn-primary-sm:hover {
+        background: var(--primary-dark);
+        transform: translateY(-1px);
+        box-shadow: var(--shadow-sm);
+    }
+    
     /* Пустое состояние */
     .empty-state {
         text-align: center;
-        padding: 3rem 2rem;
+        padding: 2.5rem 2rem;
     }
     
     .empty-state svg {
-        width: 64px;
-        height: 64px;
-        stroke: var(--text-secondary);
-        opacity: 0.5;
+        width: 56px;
+        height: 56px;
+        stroke: var(--text-muted);
+        opacity: 0.4;
         margin-bottom: 1rem;
     }
     
     .empty-state h4 {
-        font-size: 1.1rem;
+        font-size: 1rem;
         font-weight: 600;
         color: var(--text-primary);
         margin-bottom: 0.5rem;
     }
     
     .empty-state p {
-        font-size: 0.85rem;
-        color: var(--text-secondary);
+        font-size: 0.8rem;
+        color: var(--text-muted);
+        margin-bottom: 1rem;
+    }
+    
+    /* Стили для срочных писем */
+    .deadline-cell {
+        color: var(--warning);
+        font-weight: 600;
     }
     
     /* Адаптивность */
     @media (max-width: 768px) {
         .stats-grid {
             grid-template-columns: 1fr;
-            gap: 1rem;
+            gap: 0.875rem;
         }
         
         .data-table th,
         .data-table td {
-            padding: 0.75rem 1rem;
+            padding: 0.625rem 0.875rem;
         }
         
         .section-header {
@@ -268,19 +332,38 @@
         .hide-mobile {
             display: none;
         }
+        
+        .welcome-title {
+            font-size: 1.25rem;
+        }
+    }
+    
+    @media (max-width: 640px) {
+        .data-table {
+            font-size: 0.75rem;
+        }
+        
+        .stat-value {
+            font-size: 1.5rem;
+        }
+        
+        .stat-icon {
+            width: 38px;
+            height: 38px;
+        }
+        
+        .stat-icon svg {
+            width: 18px;
+            height: 18px;
+        }
     }
 </style>
 {% endblock %}
 
 {% block content %}
-<!-- Приветственная секция -->
-<div style="margin-bottom: 2rem;">
-    <h1 style="font-size: 1.75rem; font-weight: 800; color: var(--text-primary); margin-bottom: 0.25rem;">
-        👋 {{ current_user.full_name.split()[0] }} - терпи
-    </h1>
-    <p style="color: var(--text-secondary);">
-        Вот сводка по вашей корреспонденции(кто тебе на вы еще будет обращаться?).
-    </p>
+<div class="welcome-section">
+    <h1 class="welcome-title">Добро пожаловать, {{ current_user.full_name.split()[0] }}</h1>
+    <p class="welcome-subtitle">Обзор деятельности и контроль документации</p>
 </div>
 
 <!-- Статистика -->
@@ -295,8 +378,8 @@
             </div>
         </div>
         <div class="stat-value">{{ stats.total_correspondences }}</div>
-        <div class="stat-label">Всего писем</div>
-        <div class="stat-trend">Всего в системе</div>
+        <div class="stat-label">Всего документов</div>
+        <div class="stat-trend">Общее количество в системе</div>
     </div>
     
     <div class="stat-card">
@@ -309,8 +392,8 @@
             </div>
         </div>
         <div class="stat-value">{{ stats.pending_count + stats.in_progress_count }}</div>
-        <div class="stat-label">В работе</div>
-        <div class="stat-trend">Ожидают выполнения</div>
+        <div class="stat-label">В обработке</div>
+        <div class="stat-trend">Требуют внимания</div>
     </div>
     
     <div class="stat-card">
@@ -324,7 +407,7 @@
         </div>
         <div class="stat-value">{{ stats.completed_count }}</div>
         <div class="stat-label">Исполнено</div>
-        <div class="stat-trend">Успешно завершено - самому не смешно?</div>
+        <div class="stat-trend">Успешно завершено</div>
     </div>
     
     <div class="stat-card">
@@ -338,8 +421,8 @@
             </div>
         </div>
         <div class="stat-value">{{ stats.near_deadline_count }}</div>
-        <div class="stat-label">Скоро срок</div>
-        <div class="stat-trend" style="color: var(--accent);">⚠️ Какой пример ты подаешь? Закрой письма со сроком</div>
+        <div class="stat-label">Срочные</div>
+        <div class="stat-trend stat-trend-warning">⚠️ Контроль соблюдения сроков</div>
     </div>
 </div>
 
@@ -351,29 +434,30 @@
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
                 <path d="M12 8v4l3 3M12 22a10 10 0 1 1 0-20 10 10 0 0 1 0 20z"/>
             </svg>
-            Срочные письма
-            <span class="badge" style="background: var(--accent); color: white;">{{ near_deadline_correspondences|length }} требуют внимания</span>
+            Срочные поручения
+            <span class="badge-count">{{ near_deadline_correspondences|length }}</span>
         </div>
+        <span style="font-size: 0.7rem; color: var(--text-muted);">Требуют немедленного рассмотрения</span>
     </div>
     <div style="overflow-x: auto;">
         <table class="data-table">
             <thead>
                 <tr>
-                    <th>Входящий номер</th>
+                    <th>Вх. номер</th>
                     <th>Отправитель</th>
-                    <th>Содержание</th>
+                    <th class="hide-mobile">Содержание</th>
                     <th>Срок</th>
                     <th>Статус</th>
-                    <th>Действия</th>
+                    <th></th>
                 </tr>
             </thead>
             <tbody>
                 {% for corr in near_deadline_correspondences %}
                 <tr>
                     <td style="font-weight: 600;">{{ corr.incoming_number }}</td>
-                    <td>{{ corr.sender[:35] }}{% if corr.sender|length > 35 %}...{% endif %}</td>
-                    <td>{{ corr.content[:50] }}{% if corr.content|length > 50 %}...{% endif %}</td>
-                    <td style="color: var(--accent); font-weight: 600;">{{ corr.deadline.strftime('%d.%m.%Y') }}</td>
+                    <td>{{ corr.sender[:30] }}{% if corr.sender|length > 30 %}…{% endif %}</td>
+                    <td class="hide-mobile">{{ corr.content[:35] }}{% if corr.content|length > 35 %}…{% endif %}</td>
+                    <td class="deadline-cell">{{ corr.deadline.strftime('%d.%m.%Y') }}</td>
                     <td>
                         <span class="badge 
                             {% if corr.status.value == 'Исполнено' %}badge-completed
@@ -384,12 +468,12 @@
                         </span>
                     </td>
                     <td>
-                        <a href="/api/correspondences/{{ corr.id }}" class="btn-outline btn-sm" style="display: inline-flex; align-items: center; gap: 0.25rem; text-decoration: none;">
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <a href="/api/correspondences/{{ corr.id }}" class="btn-outline btn-sm">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
                                 <circle cx="12" cy="12" r="3"/>
                             </svg>
-                            Просмотр
+                            Открыть
                         </a>
                     </td>
                 </tr>
@@ -400,7 +484,7 @@
 </div>
 {% endif %}
 
-<!-- Последние письма -->
+<!-- Последние документы -->
 <div class="section-card">
     <div class="section-header">
         <div class="section-title">
@@ -409,9 +493,9 @@
             </svg>
             Последние обновления
         </div>
-        <a href="/api/correspondences/" class="btn-outline btn-sm" style="text-decoration: none; display: inline-flex; align-items: center; gap: 0.25rem;">
-            Все письма
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <a href="/api/correspondences/" class="btn-outline btn-sm">
+            Все документы
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <line x1="5" y1="12" x2="19" y2="12"/>
                 <polyline points="12 5 19 12 12 19"/>
             </svg>
@@ -423,13 +507,13 @@
         <table class="data-table">
             <thead>
                 <tr>
-                    <th>Входящий номер</th>
-                    <th>Дата поступления</th>
+                    <th>Вх. номер</th>
+                    <th>Дата</th>
                     <th>Отправитель</th>
-                    <th>Содержание</th>
+                    <th class="hide-mobile">Содержание</th>
                     <th>Срок</th>
                     <th>Статус</th>
-                    <th>Действия</th>
+                    <th></th>
                 </tr>
             </thead>
             <tbody>
@@ -437,8 +521,8 @@
                 <tr>
                     <td style="font-weight: 600;">{{ corr.incoming_number }}</td>
                     <td>{{ corr.received_date.strftime('%d.%m.%Y') }}</td>
-                    <td>{{ corr.sender[:35] }}{% if corr.sender|length > 35 %}...{% endif %}</td>
-                    <td>{{ corr.content[:50] }}{% if corr.content|length > 50 %}...{% endif %}</td>
+                    <td>{{ corr.sender[:25] }}{% if corr.sender|length > 25 %}…{% endif %}</td>
+                    <td class="hide-mobile">{{ corr.content[:35] }}{% if corr.content|length > 35 %}…{% endif %}</td>
                     <td>{{ corr.deadline.strftime('%d.%m.%Y') }}</td>
                     <td>
                         <span class="badge 
@@ -450,12 +534,12 @@
                         </span>
                     </td>
                     <td>
-                        <a href="/api/correspondences/{{ corr.id }}" class="btn-outline btn-sm" style="display: inline-flex; align-items: center; gap: 0.25rem; text-decoration: none;">
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <a href="/api/correspondences/{{ corr.id }}" class="btn-outline btn-sm">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
                                 <circle cx="12" cy="12" r="3"/>
                             </svg>
-                            Просмотр
+                            Открыть
                         </a>
                     </td>
                 </tr>
@@ -465,18 +549,18 @@
     </div>
     {% else %}
     <div class="empty-state">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
             <path d="M4 4h16v16H4z"/>
             <path d="M8 8h8M8 12h6M8 16h4"/>
         </svg>
-        <h4>Нет писем</h4>
-        <p>У вас пока нет ни одного письма в системе - но скоро это исправят...поверь...</p>
-        <a href="/api/correspondences/create" class="btn-outline btn-sm" style="display: inline-flex; align-items: center; gap: 0.25rem; text-decoration: none; margin-top: 0.5rem;">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <h4>Нет документов</h4>
+        <p>В системе пока нет зарегистрированных документов</p>
+        <a href="/api/correspondences/create" class="btn-primary-sm btn-sm">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <line x1="12" y1="5" x2="12" y2="19"/>
                 <line x1="5" y1="12" x2="19" y2="12"/>
             </svg>
-            Создать первое письмо
+            Создать документ
         </a>
     </div>
     {% endif %}
@@ -486,16 +570,16 @@
 {% block extra_js %}
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // Анимация появления карточек
+        // Плавная анимация появления
         const cards = document.querySelectorAll('.stat-card, .section-card');
         cards.forEach((card, index) => {
             card.style.opacity = '0';
-            card.style.transform = 'translateY(20px)';
+            card.style.transform = 'translateY(15px)';
             setTimeout(() => {
-                card.style.transition = 'all 0.4s ease-out';
+                card.style.transition = 'all 0.35s cubic-bezier(0.2, 0.9, 0.4, 1.1)';
                 card.style.opacity = '1';
                 card.style.transform = 'translateY(0)';
-            }, index * 100);
+            }, index * 50);
         });
     });
 </script>
