@@ -14,6 +14,7 @@ from app.routers import auth, correspondences, admin, notifications
 from app.auth import get_current_user
 from app.routers import auth, correspondences, admin, notifications, flows
 from app.routers import auth, correspondences, admin, notifications, flows, requests
+from app.routers import profile
 # Создание таблиц в базе данных
 Base.metadata.create_all(bind=engine)
 
@@ -47,6 +48,7 @@ app.include_router(admin.router)
 app.include_router(notifications.router)
 app.include_router(flows.router)
 app.include_router(requests.router)
+app.include_router(profile.router)
 
 # --- Инициализация первого админа при старте ---
 @app.on_event("startup")

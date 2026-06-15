@@ -1,0 +1,846 @@
+{% extends "base.html" %}
+
+{% block title %}Мой профиль | CorpoFlow{% endblock %}
+
+{% block extra_css %}
+<style>
+    .page-header {
+        margin-bottom: 1.75rem;
+    }
+    
+    .page-header h1 {
+        font-size: 1.35rem;
+        font-weight: 600;
+        color: var(--text-primary);
+        margin-bottom: 0.25rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        letter-spacing: -0.3px;
+    }
+    
+    .page-header h1 svg {
+        width: 28px;
+        height: 28px;
+        stroke: var(--primary);
+    }
+    
+    .profile-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1.5rem;
+    }
+    
+    .profile-section {
+        background: var(--bg-card);
+        border-radius: var(--radius-lg);
+        border: 1px solid var(--border-light);
+        padding: 1.25rem;
+    }
+    
+    .profile-section h3 {
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: var(--text-primary);
+        margin-bottom: 1rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 2px solid var(--primary);
+        display: inline-block;
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+    }
+    
+    .avatar-section {
+        text-align: center;
+        margin-bottom: 1.5rem;
+    }
+    
+    .avatar {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 3px solid var(--primary);
+        background: var(--primary-bg);
+        margin-bottom: 0.75rem;
+    }
+    
+    .avatar-placeholder {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        background: var(--primary-bg);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 0.75rem;
+        border: 3px solid var(--primary);
+    }
+    
+    .avatar-placeholder svg {
+        width: 50px;
+        height: 50px;
+        stroke: var(--primary);
+    }
+    
+    .avatar-actions {
+        display: flex;
+        gap: 0.5rem;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+    
+    .btn-icon {
+        padding: 0.4rem 0.8rem;
+        font-size: 0.7rem;
+        border-radius: var(--radius-md);
+        cursor: pointer;
+        transition: var(--transition);
+        border: none;
+        background: var(--primary-bg);
+        color: var(--text-primary);
+    }
+    
+    .btn-icon:hover {
+        background: var(--primary);
+        color: white;
+    }
+    
+    .form-group {
+        margin-bottom: 1rem;
+    }
+    
+    .form-group label {
+        display: block;
+        font-size: 0.65rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: var(--text-muted);
+        margin-bottom: 0.3rem;
+    }
+    
+    .form-control {
+        width: 100%;
+        padding: 0.55rem 0.85rem;
+        background: var(--bg-main);
+        border: 1.5px solid var(--border-light);
+        border-radius: var(--radius-md);
+        color: var(--text-primary);
+        font-size: 0.85rem;
+        transition: var(--transition);
+    }
+    
+    .form-control:focus {
+        outline: none;
+        border-color: var(--primary);
+        box-shadow: var(--shadow-focus);
+    }
+    
+    .readonly-field {
+        background: var(--primary-bg);
+        cursor: not-allowed;
+        border-color: var(--border-light);
+    }
+    
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.75rem;
+        margin-bottom: 1.25rem;
+    }
+    
+    .stat-card {
+        background: var(--primary-bg);
+        border-radius: var(--radius-md);
+        padding: 0.75rem;
+        text-align: center;
+        border: 1px solid var(--border-light);
+    }
+    
+    .stat-number {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--primary);
+        line-height: 1.2;
+    }
+    
+    .stat-label {
+        font-size: 0.6rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+        color: var(--text-muted);
+    }
+    
+    .btn-action {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.5rem 1rem;
+        border-radius: var(--radius-md);
+        font-size: 0.75rem;
+        font-weight: 500;
+        text-decoration: none;
+        transition: var(--transition);
+        cursor: pointer;
+        border: none;
+    }
+    
+    .btn-primary {
+        background: var(--primary);
+        color: white;
+    }
+    
+    .btn-primary:hover {
+        background: var(--primary-dark);
+        transform: translateY(-1px);
+        box-shadow: var(--shadow-sm);
+    }
+    
+    .btn-secondary {
+        background: transparent;
+        border: 1px solid var(--border-light);
+        color: var(--text-secondary);
+    }
+    
+    .btn-secondary:hover {
+        border-color: var(--primary);
+        color: var(--primary);
+        background: var(--primary-bg);
+    }
+    
+    .btn-danger {
+        background: transparent;
+        border: 1px solid var(--danger);
+        color: var(--danger);
+    }
+    
+    .btn-danger:hover {
+        background: var(--danger);
+        color: white;
+    }
+    
+    .alert-error {
+        background: #fee2e2;
+        color: #dc2626;
+        padding: 0.6rem 0.75rem;
+        border-radius: var(--radius-md);
+        margin-bottom: 1rem;
+        border-left: 3px solid #dc2626;
+        font-size: 0.8rem;
+    }
+    
+    .alert-success {
+        background: #d1fae5;
+        color: #059669;
+        padding: 0.6rem 0.75rem;
+        border-radius: var(--radius-md);
+        margin-bottom: 1rem;
+        border-left: 3px solid #059669;
+        font-size: 0.8rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+    
+    .chart-container {
+        margin: 1rem 0;
+        padding: 0.5rem;
+    }
+    
+    .chart-title {
+        font-size: 0.7rem;
+        font-weight: 600;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+        margin-bottom: 0.75rem;
+        text-align: center;
+    }
+    
+    .donut-chart {
+        position: relative;
+        width: 120px;
+        height: 120px;
+        margin: 0 auto;
+    }
+    
+    .donut-chart svg {
+        width: 100%;
+        height: 100%;
+        transform: rotate(-90deg);
+    }
+    
+    .donut-center {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        text-align: center;
+    }
+    
+    .donut-percent {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: var(--text-primary);
+    }
+    
+    .donut-label {
+        font-size: 0.55rem;
+        color: var(--text-muted);
+    }
+    
+    .progress-bar-container {
+        background: var(--border-light);
+        border-radius: 4px;
+        height: 8px;
+        overflow: hidden;
+        margin: 0.5rem 0;
+    }
+    
+    .progress-fill {
+        height: 100%;
+        border-radius: 4px;
+        transition: width 0.5s ease;
+    }
+    
+    .progress-fill-success { background: var(--success); }
+    .progress-fill-primary { background: var(--primary); }
+    .progress-fill-warning { background: var(--warning); }
+    
+    .stat-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.4rem 0;
+        border-bottom: 1px solid var(--border-light);
+    }
+    
+    .stat-row-label {
+        font-size: 0.75rem;
+        color: var(--text-muted);
+    }
+    
+    .stat-row-value {
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: var(--text-primary);
+    }
+    
+    /* Таблица коллег - профессиональный стиль */
+    .colleagues-section {
+        margin-top: 1.5rem;
+    }
+    
+    .colleagues-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.85rem;
+    }
+    
+    .colleagues-table th {
+        text-align: left;
+        padding: 0.875rem 0.75rem;
+        font-size: 0.7rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: var(--text-muted);
+        background: var(--primary-bg);
+        border-bottom: 1px solid var(--border-light);
+    }
+    
+    .colleagues-table td {
+        padding: 0.75rem;
+        color: var(--text-primary);
+        border-bottom: 1px solid var(--border-light);
+        vertical-align: middle;
+    }
+    
+    .colleagues-table tr {
+        transition: all 0.2s ease;
+    }
+    
+    .colleagues-table tr.clickable {
+        cursor: pointer;
+    }
+    
+    .colleagues-table tr.clickable:hover {
+        background: var(--primary-bg);
+    }
+    
+    .colleagues-table tr.current-user {
+        background: var(--primary-bg);
+        border-left: 3px solid var(--primary);
+    }
+    
+    .colleagues-table tr.current-user td:first-child {
+        padding-left: calc(0.75rem - 3px);
+    }
+    
+    .employee-name {
+        font-weight: 500;
+        color: var(--text-primary);
+    }
+    
+    .employee-badge {
+        font-size: 0.65rem;
+        color: var(--primary);
+        margin-left: 0.5rem;
+    }
+    
+    .progress-cell {
+        min-width: 120px;
+    }
+    
+    .progress-wrapper {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .progress-bar-small {
+        flex: 1;
+        height: 6px;
+        background: var(--border-light);
+        border-radius: 3px;
+        overflow: hidden;
+    }
+    
+    .progress-fill-small {
+        height: 100%;
+        background: var(--success);
+        border-radius: 3px;
+        transition: width 0.3s ease;
+    }
+    
+    .progress-percent {
+        font-size: 0.75rem;
+        font-weight: 500;
+        color: var(--text-secondary);
+        min-width: 45px;
+        text-align: right;
+    }
+    
+    .rating-badge {
+        display: inline-block;
+        padding: 0.25rem 0.6rem;
+        border-radius: 20px;
+        font-size: 0.7rem;
+        font-weight: 600;
+        text-align: center;
+        min-width: 65px;
+    }
+    
+    .rating-1 { background: #fef3c7; color: #d97706; }
+    .rating-2 { background: #dbeafe; color: #2563eb; }
+    .rating-3 { background: #d1fae5; color: #059669; }
+    .rating-other { background: #f1f5f9; color: #64748b; }
+    
+    [data-theme='dark'] .rating-other { background: #334155; color: #94a3b8; }
+    
+    .colleagues-hint {
+        font-size: 0.7rem;
+        color: var(--text-muted);
+        margin-top: 1rem;
+        padding-top: 0.75rem;
+        border-top: 1px solid var(--border-light);
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .colleagues-hint svg {
+        width: 14px;
+        height: 14px;
+        stroke: currentColor;
+    }
+    
+    .modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        backdrop-filter: blur(4px);
+        z-index: 1000;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .modal.show {
+        display: flex;
+    }
+    
+    .modal-content {
+        background: var(--bg-card);
+        border-radius: var(--radius-lg);
+        max-width: 400px;
+        width: 90%;
+        padding: 1.5rem;
+        border: 1px solid var(--border-light);
+    }
+    
+    .modal-header {
+        margin-bottom: 1rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 1px solid var(--border-light);
+    }
+    
+    .modal-header h3 {
+        font-size: 1rem;
+        font-weight: 600;
+        color: var(--text-primary);
+    }
+    
+    .modal-actions {
+        display: flex;
+        gap: 0.75rem;
+        margin-top: 1.5rem;
+        justify-content: flex-end;
+    }
+    
+    @media (max-width: 768px) {
+        .profile-grid {
+            grid-template-columns: 1fr;
+            gap: 1rem;
+        }
+        
+        .stats-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+        
+        .colleagues-table th,
+        .colleagues-table td {
+            padding: 0.5rem;
+        }
+        
+        .progress-wrapper {
+            gap: 0.25rem;
+        }
+        
+        .progress-percent {
+            font-size: 0.7rem;
+            min-width: 40px;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+            <circle cx="12" cy="7" r="4"/>
+        </svg>
+        Мой профиль
+    </h1>
+</div>
+
+{% if request.query_params.get('success') == 'password_changed' %}
+<div class="alert-success">
+    <span>Пароль успешно изменен</span>
+    <button onclick="this.parentElement.style.display='none'" style="background: none; border: none; cursor: pointer;">✕</button>
+</div>
+{% endif %}
+
+<div class="profile-grid">
+    <!-- Левая колонка - Личные данные -->
+    <div class="profile-section">
+        <h3>Личные данные</h3>
+        
+        <!-- Аватар -->
+        <div class="avatar-section">
+            {% if avatar_url %}
+            <img src="{{ avatar_url }}" alt="Avatar" class="avatar">
+            {% else %}
+            <div class="avatar-placeholder">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                    <circle cx="12" cy="7" r="4"/>
+                </svg>
+            </div>
+            {% endif %}
+            <div class="avatar-actions">
+                <form action="/profile/upload-avatar" method="POST" enctype="multipart/form-data" id="avatarForm">
+                    <label class="btn-icon" style="display: inline-block; cursor: pointer;">
+                        Загрузить
+                        <input type="file" name="avatar" accept="image/*" style="display: none;" onchange="document.getElementById('avatarForm').submit()">
+                    </label>
+                </form>
+                {% if avatar_url %}
+                <form action="/profile/delete-avatar" method="POST">
+                    <button type="submit" class="btn-icon">Удалить</button>
+                </form>
+                {% endif %}
+            </div>
+        </div>
+        
+        {% if error %}
+        <div class="alert-error">{{ error }}</div>
+        {% endif %}
+        
+        <form action="/profile/update" method="POST">
+            <div class="form-group">
+                <label>Email</label>
+                <input type="email" name="email" class="form-control" value="{{ current_user.email }}" required>
+            </div>
+            
+            <div class="form-group">
+                <label>Логин</label>
+                <input type="text" name="username" class="form-control" value="{{ current_user.username }}" required>
+            </div>
+            
+            <div class="form-group">
+                <label>Полное имя</label>
+                <input type="text" name="full_name" class="form-control" value="{{ current_user.full_name }}" required>
+            </div>
+            
+            <div class="form-group">
+                <label>Отдел</label>
+                <input type="text" class="form-control readonly-field" value="{{ current_user.department.value }}" readonly disabled>
+            </div>
+            
+            <div class="form-group">
+                <label>Телефон</label>
+                <input type="tel" name="phone_number" class="form-control" value="{{ current_user.phone_number or '' }}" placeholder="+7 (XXX) XXX-XX-XX">
+            </div>
+            
+            <div class="form-group">
+                <label>Статус</label>
+                <div>
+                    {% if current_user.is_active %}
+                    <span class="badge-active" style="display: inline-flex; align-items: center; gap: 0.3rem; padding: 0.2rem 0.7rem; border-radius: 20px; font-size: 0.7rem; font-weight: 600; background: #d1fae5; color: #059669;">
+                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+                        Активен
+                    </span>
+                    {% else %}
+                    <span class="badge-blocked" style="display: inline-flex; align-items: center; gap: 0.3rem; padding: 0.2rem 0.7rem; border-radius: 20px; font-size: 0.7rem; font-weight: 600; background: #fee2e2; color: #dc2626;">
+                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                        Заблокирован
+                    </span>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label>Роль</label>
+                <div>
+                    {% if current_user.is_admin %}
+                    <span class="badge-admin" style="display: inline-flex; align-items: center; gap: 0.3rem; padding: 0.2rem 0.7rem; border-radius: 20px; font-size: 0.7rem; font-weight: 600; background: var(--primary-bg); color: var(--primary);">
+                        Администратор
+                    </span>
+                    {% else %}
+                    <span class="badge-user" style="display: inline-flex; align-items: center; gap: 0.3rem; padding: 0.2rem 0.7rem; border-radius: 20px; font-size: 0.7rem; font-weight: 600; background: var(--border-light); color: var(--text-muted);">
+                        Сотрудник
+                    </span>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div style="margin-top: 1rem;">
+                <button type="submit" class="btn-action btn-primary">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/>
+                        <polyline points="17 21 17 13 7 13 7 21"/>
+                        <polyline points="7 3 7 8 15 8"/>
+                    </svg>
+                    Сохранить изменения
+                </button>
+            </div>
+        </form>
+    </div>
+    
+    <!-- Правая колонка - Статистика -->
+    <div class="profile-section">
+        <h3>Моя статистика</h3>
+        
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-number">{{ user_stats.assigned_count }}</div>
+                <div class="stat-label">Назначено</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" style="color: #059669;">{{ user_stats.completed_count }}</div>
+                <div class="stat-label">Выполнено</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">{{ user_stats.created_count }}</div>
+                <div class="stat-label">Создано</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">{{ user_stats.in_progress_count }}</div>
+                <div class="stat-label">В работе</div>
+            </div>
+        </div>
+        
+        {% set completion_rate = (user_stats.completed_count / user_stats.assigned_count * 100)|round(1) if user_stats.assigned_count > 0 else 0 %}
+        {% set creation_rate = (user_stats.created_count / (user_stats.created_count + 1) * 100)|round(1) %}
+        
+        <div class="chart-container">
+            <div class="chart-title">Эффективность исполнения</div>
+            <div class="donut-chart">
+                <svg viewBox="0 0 100 100">
+                    <circle cx="50" cy="50" r="45" fill="none" stroke="var(--border-light)" stroke-width="10"/>
+                    <circle cx="50" cy="50" r="45" fill="none" stroke="var(--success)" stroke-width="10"
+                            stroke-dasharray="{{ (completion_rate * 2.83)|round }} 283"
+                            stroke-dashoffset="0"
+                            stroke-linecap="round"/>
+                </svg>
+                <div class="donut-center">
+                    <div class="donut-percent">{{ completion_rate }}%</div>
+                    <div class="donut-label">выполнено</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="stat-row">
+            <span class="stat-row-label">Прогресс выполнения</span>
+            <span class="stat-row-value">{{ user_stats.completed_count }} / {{ user_stats.assigned_count }}</span>
+        </div>
+        <div class="progress-bar-container">
+            <div class="progress-fill progress-fill-success" style="width: {{ completion_rate }}%"></div>
+        </div>
+        
+        <div class="stat-row">
+            <span class="stat-row-label">Активность в системе</span>
+            <span class="stat-row-value">{{ user_stats.created_count }} документов создано</span>
+        </div>
+        <div class="progress-bar-container">
+            <div class="progress-fill progress-fill-primary" style="width: {{ creation_rate }}%"></div>
+        </div>
+        
+        <div style="margin-top: 1rem;">
+            <button class="btn-action btn-secondary" onclick="showPasswordModal()">
+                Сменить пароль
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Сравнение с коллегами -->
+<div class="profile-section colleagues-section">
+    <h3>Рейтинг сотрудников отдела "{{ current_user.department.value }}"</h3>
+    
+    {% if colleagues %}
+    <div style="overflow-x: auto;">
+        <table class="colleagues-table">
+            <thead>
+                <tr>
+                    <th>Сотрудник</th>
+                    <th>Назначено</th>
+                    <th>Выполнено</th>
+                    <th>Эффективность</th>
+                    <th>Место</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for col in colleagues %}
+                <tr class="clickable {% if col.id == current_user.id %}current-user{% endif %}" 
+                    onclick="window.location.href='/profile/{{ col.id }}'">
+                    <td>
+                        <span class="employee-name">{{ col.full_name }}</span>
+                        {% if col.id == current_user.id %}
+                        <span class="employee-badge">(Вы)</span>
+                        {% endif %}
+                    </td>
+                    <td>{{ col.assigned_count }}</td>
+                    <td>{{ col.completed_count }}</td>
+                    <td class="progress-cell">
+                        <div class="progress-wrapper">
+                            <div class="progress-bar-small">
+                                <div class="progress-fill-small" style="width: {{ col.completion_rate }}%"></div>
+                            </div>
+                            <span class="progress-percent">{{ col.completion_rate }}%</span>
+                        </div>
+                    </td>
+                    <td>
+                        {% if loop.index == 1 %}
+                        <span class="rating-badge rating-1">1 место</span>
+                        {% elif loop.index == 2 %}
+                        <span class="rating-badge rating-2">2 место</span>
+                        {% elif loop.index == 3 %}
+                        <span class="rating-badge rating-3">3 место</span>
+                        {% else %}
+                        <span class="rating-badge rating-other">{{ loop.index }} место</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <div class="colleagues-hint">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+            <circle cx="12" cy="12" r="3"/>
+        </svg>
+        Нажмите на строку с сотрудником, чтобы открыть его профиль
+    </div>
+    {% else %}
+    <p style="color: var(--text-muted); text-align: center; padding: 2rem;">В вашем отделе пока нет других сотрудников</p>
+    {% endif %}
+</div>
+
+<!-- Модальное окно смены пароля -->
+<div id="passwordModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Смена пароля</h3>
+        </div>
+        {% if password_error %}
+        <div class="alert-error">{{ password_error }}</div>
+        {% endif %}
+        <form action="/profile/change-password" method="POST" id="passwordForm">
+            <div class="form-group">
+                <label>Текущий пароль</label>
+                <input type="password" name="current_password" class="form-control" required>
+            </div>
+            <div class="form-group">
+                <label>Новый пароль</label>
+                <input type="password" name="new_password" class="form-control" required>
+            </div>
+            <div class="form-group">
+                <label>Подтверждение пароля</label>
+                <input type="password" name="confirm_password" class="form-control" required>
+            </div>
+            <div class="modal-actions">
+                <button type="button" class="btn-action btn-secondary" onclick="hidePasswordModal()">Отмена</button>
+                <button type="submit" class="btn-action btn-primary">Сменить пароль</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    function showPasswordModal() {
+        document.getElementById('passwordModal').classList.add('show');
+    }
+    
+    function hidePasswordModal() {
+        document.getElementById('passwordModal').classList.remove('show');
+    }
+    
+    document.getElementById('passwordModal').addEventListener('click', function(e) {
+        if (e.target === this) {
+            hidePasswordModal();
+        }
+    });
+    
+    // Анимация прогресс-баров
+    document.addEventListener('DOMContentLoaded', function() {
+        const progressBars = document.querySelectorAll('.progress-fill, .progress-fill-small');
+        progressBars.forEach(bar => {
+            const width = bar.style.width;
+            bar.style.width = '0%';
+            setTimeout(() => {
+                bar.style.width = width;
+            }, 100);
+        });
+    });
+</script>
+{% endblock %}
